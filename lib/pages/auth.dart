@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photoflow/app_background.dart';
-import 'package:photoflow/database/auth_service.dart';
+import 'package:photoflow/database/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthPage extends StatefulWidget {
