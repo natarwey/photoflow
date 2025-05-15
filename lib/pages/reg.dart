@@ -1,6 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:photoflow/app_background.dart';
+import 'package:photoflow/database/models/city.dart';
 import 'package:photoflow/database/services/auth_service.dart';
+import 'package:photoflow/database/services/city_service.dart';
 import 'package:photoflow/database/services/users_table.dart';
 import 'package:photoflow/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,8 +22,33 @@ class _RegPageState extends State<RegPage> {
   TextEditingController passController = TextEditingController();
   TextEditingController repeatController = TextEditingController();
   AuthService authService = AuthService();
-  UsersTable usersTable = UsersTable();
+  CityService cityService = CityService();
   bool isPhotographer = false;
+  bool isLoading = false;
+  List<City> cities = [];
+  City? selectedCity;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCities();
+  }
+
+  Future<void> _loadCities() async {
+    try {
+      final citiesList = await cityService.getCities();
+      setState(() {
+        cities = citiesList;
+        if (cities.isNotEmpty) {
+          selectedCity = cities.first;
+        }
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Ошибка при загрузке городов: $e');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -181,11 +209,46 @@ class _RegPageState extends State<RegPage> {
                     ),
                   ],
                 ),
+                if (isPhotographer && cities.isNotEmpty) ...[
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.015),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    child: DropdownButtonFormField<City>(
+                      value: selectedCity,
+                      decoration: InputDecoration(
+                        labelText: 'Город',
+                        labelStyle: const TextStyle(color: Colors.black),
+                        prefixIcon: const Icon(Icons.location_city, color: Color(0xFFFFD700)),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6),
+                          borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6),
+                          borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                        ),
+                      ),
+                      items: cities.map((City city) {
+                        return DropdownMenuItem<City>(
+                          value: city,
+                          child: Text(city.title),
+                        );
+                      }).toList(),
+                      onChanged: (City? newValue) {
+                        setState(() {
+                          selectedCity = newValue;
+                        });
+                      },
+                      dropdownColor: Colors.white,
+                      style: const TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ],
                 SizedBox(height: MediaQuery.of(context).size.height * 0.015),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.6,
                   child: ElevatedButton(
-                    onPressed: () async {
+                    onPressed: isLoading ? null : () async {
                       if (emailController.text.isEmpty ||
                           passController.text.isEmpty ||
                           repeatController.text.isEmpty ||
@@ -199,61 +262,103 @@ class _RegPageState extends State<RegPage> {
                             backgroundColor: Color(0xFFFFD700),
                           ),
                         );
-                      } else {
-                        if (passController.text == repeatController.text) {
-                          var user = await authService.signUp(
-                            emailController.text, passController.text);
-                          if (user != null) {
-                            await usersTable.addUser(
-                              nameController.text, 
-                              emailController.text, 
-                              passController.text,
-                              surname: surnameController.text,
+                        return;
+                      }
+                      
+                      if (passController.text != repeatController.text) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "Пароли не совпадают",
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            backgroundColor: Color(0xFFFFD700),
+                          ),
+                        );
+                        return;
+                      }
+                      
+                      setState(() {
+                        isLoading = true;
+                      });
+                      
+                      try {
+                        // Регистрация пользователя
+                        final user = await authService.signUp(
+                          emailController.text,
+                          passController.text,
+                          nameController.text,
+                          surname: surnameController.text,
+                        );
+                        
+                        if (user != null) {
+                          // Если пользователь - фотограф, создаем запись в таблице photographers
+                          if (isPhotographer && selectedCity != null) {
+                            final success = await authService.createPhotographerAccount(
+                              user.id,
+                              selectedCity!.id,
                             );
                             
-                            // Если пользователь - фотограф, создаем запись в таблице photographers
-                            if (isPhotographer) {
-                              await supabase.from('photographers').insert({
-                                'user_id': user.id,
+                            if (!success) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Ошибка при создании аккаунта фотографа",
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                  backgroundColor: Color(0xFFFFD700),
+                                ),
+                              );
+                              setState(() {
+                                isLoading = false;
                               });
+                              return;
                             }
-                            
-                            final prefs = await SharedPreferences.getInstance();
-                            await prefs.setBool('isLoggedIn', true);
-                            await prefs.setBool('isPhotographer', isPhotographer);
-                            
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "Зарегистрирован: ${user.email!}",
-                                  style: const TextStyle(color: Colors.black),
-                                ),
-                                backgroundColor: const Color(0xFFFFD700),
-                              ),
-                            );
-                            Navigator.popAndPushNamed(context, '/home');
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  "Пользователь не создан",
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                                backgroundColor: Color(0xFFFFD700),
-                              ),
-                            );
                           }
+                          
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.setBool('isLoggedIn', true);
+                          await prefs.setBool('isPhotographer', isPhotographer);
+                          
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "Зарегистрирован: ${user.email!}",
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                              backgroundColor: const Color(0xFFFFD700),
+                            ),
+                          );
+                          
+                          Navigator.popAndPushNamed(context, '/home');
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
-                                "Пароли не совпадают",
+                                "Ошибка регистрации. Возможно, такой email уже существует.",
                                 style: TextStyle(color: Colors.black),
                               ),
                               backgroundColor: Color(0xFFFFD700),
                             ),
                           );
                         }
+                      } catch (e) {
+                        if (kDebugMode) {
+                          print('Ошибка при регистрации: $e');
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Ошибка: $e",
+                              style: const TextStyle(color: Colors.black),
+                            ),
+                            backgroundColor: const Color(0xFFFFD700),
+                          ),
+                        );
+                      } finally {
+                        setState(() {
+                          isLoading = false;
+                        });
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -264,10 +369,19 @@ class _RegPageState extends State<RegPage> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text(
-                      "Создать аккаунт",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.black,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            "Создать аккаунт",
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
                   ),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.015),

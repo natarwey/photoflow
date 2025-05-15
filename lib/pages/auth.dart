@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:photoflow/app_background.dart';
 import 'package:photoflow/database/services/auth_service.dart';
+import 'package:photoflow/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthPage extends StatefulWidget {
@@ -14,6 +16,7 @@ class _AuthPageState extends State<AuthPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
   AuthService authService = AuthService();
+  bool isLoading = false;
   
   @override
   Widget build(BuildContext context) {
@@ -99,7 +102,7 @@ class _AuthPageState extends State<AuthPage> {
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.6,
                 child: ElevatedButton(
-                  onPressed: () async {
+                  onPressed: isLoading ? null : () async {
                     if (emailController.text.isEmpty ||
                         passController.text.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -111,24 +114,68 @@ class _AuthPageState extends State<AuthPage> {
                           backgroundColor: Color(0xFFFFD700),
                         ),
                       );
-                    } else {
+                      return;
+                    }
+                    
+                    setState(() {
+                      isLoading = true;
+                    });
+                    
+                    try {
                       var user = await authService.signIn(
                         emailController.text, passController.text);
+                      
                       if (user != null) {
+                        if (kDebugMode) {
+                          print('Успешный вход: ${user.email}');
+                        }
+                        
+                        // Проверяем, является ли пользователь фотографом
+                        final photographerData = await supabase
+                            .from('photographers')
+                            .select()
+                            .eq('user_id', user.id)
+                            .maybeSingle();
+                        
+                        final isPhotographer = photographerData != null;
+                        
+                        if (kDebugMode) {
+                          print('Пользователь является фотографом: $isPhotographer');
+                        }
+                        
                         final prefs = await SharedPreferences.getInstance();
                         await prefs.setBool('isLoggedIn', true);
+                        await prefs.setBool('isPhotographer', isPhotographer);
+                        
                         Navigator.popAndPushNamed(context, '/home');
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text(
-                              "Пользователь не найден",
+                              "Неверный email или пароль",
                               style: TextStyle(color: Colors.black),
                             ),
                             backgroundColor: Color(0xFFFFD700),
                           ),
                         );
                       }
+                    } catch (e) {
+                      if (kDebugMode) {
+                        print('Ошибка при входе: $e');
+                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "Ошибка: $e",
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                          backgroundColor: const Color(0xFFFFD700),
+                        ),
+                      );
+                    } finally {
+                      setState(() {
+                        isLoading = false;
+                      });
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -139,10 +186,19 @@ class _AuthPageState extends State<AuthPage> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text(
-                    "Войти",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.black,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          "Войти",
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
                 ),
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.015),

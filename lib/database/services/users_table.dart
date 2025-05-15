@@ -10,7 +10,7 @@ class UsersTable {
         'name': name,
         'surname': surname,
         'email': email,
-        'password': password, // Обратите внимание: хранение паролей в открытом виде небезопасно
+        'password': password,
         'avatar_url': avatarUrl,
       });
       
