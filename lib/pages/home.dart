@@ -149,7 +149,7 @@ class _HomePageState extends State<HomePage> {
                     border: Border.all(color: const Color(0xFFFFD700)),
                   ),
                   child: Text(
-                    currentIdea!.mood,
+                    currentIdea!.moodTitle ?? 'Нет настроения',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

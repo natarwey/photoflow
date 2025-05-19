@@ -29,7 +29,7 @@ class PhotographerService {
       final photographersData = await supabase
           .from('photographers')
           .select()
-          .in_('id', photographerIds);
+          .inFilter('id', photographerIds);
       
       List<Photographer> photographers = photographersData.map<Photographer>((item) => Photographer.fromJson(item)).toList();
       
@@ -108,7 +108,7 @@ class PhotographerService {
       final usersData = await supabase
           .from('users')
           .select()
-          .in_('id', userIds.toList());
+          .inFilter('id', userIds.toList());
       
       Map<String, app_user.User> userMap = {};
       for (var userData in usersData) {
@@ -119,7 +119,7 @@ class PhotographerService {
       final citiesData = await supabase
           .from('city')
           .select()
-          .in_('id', cityIds.toList());
+          .inFilter('id', cityIds.toList());
       
       Map<int, String> cityMap = {};
       for (var cityData in citiesData) {

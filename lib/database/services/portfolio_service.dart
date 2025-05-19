@@ -112,7 +112,7 @@ class PortfolioService {
         final genresResponse = await supabase
             .from('genres')
             .select()
-            .in_('id', genreIds.toList());
+            .inFilter('id', genreIds.toList());
         
         Map<int, String> genreMap = {};
         for (var genre in genresResponse) {
@@ -130,7 +130,7 @@ class PortfolioService {
         final moodsResponse = await supabase
             .from('mood')
             .select()
-            .in_('id', moodIds.toList());
+            .inFilter('id', moodIds.toList());
         
         Map<int, String> moodMap = {};
         for (var mood in moodsResponse) {
@@ -150,7 +150,7 @@ class PortfolioService {
         final locationsResponse = await supabase
             .from('location')
             .select()
-            .in_('id', locationIds.toList());
+            .inFilter('id', locationIds.toList());
         
         Map<int, String> locationMap = {};
         for (var location in locationsResponse) {
