@@ -5,12 +5,12 @@ class Photographer {
   final String? bio;
   final int cityId;
   final int? experience;
-  final int price;
+  final int? price;
   final String? socialLinks;
-  final String name; // Дополнительное поле для отображения
-  final String? avatarUrl; // Дополнительное поле для отображения
-  final String? contactInfo; // Дополнительное поле для отображения
-  final String? description; // Дополнительное поле для отображения
+  String? name;
+  String? surname;
+  String? avatarUrl;
+  String? cityTitle;
   
   Photographer({
     required this.id,
@@ -19,12 +19,12 @@ class Photographer {
     this.bio,
     required this.cityId,
     this.experience,
-    required this.price,
+    this.price,
     this.socialLinks,
-    required this.name,
+    this.name,
+    this.surname,
     this.avatarUrl,
-    this.contactInfo,
-    this.description,
+    this.cityTitle,
   });
   
   factory Photographer.fromJson(Map<String, dynamic> json) {
@@ -33,16 +33,10 @@ class Photographer {
       createdAt: DateTime.parse(json['created_at']),
       userId: json['user_id'],
       bio: json['bio'],
-      cityId: json['city_id'] ?? 0,
+      cityId: json['city_id'],
       experience: json['experience'],
-      price: json['price'] ?? 0,
+      price: json['price'],
       socialLinks: json['social_links'],
-      name: json['users'] != null 
-          ? '${json['users']['name']} ${json['users']['surname'] ?? ''}'
-          : 'Неизвестный фотограф',
-      avatarUrl: json['users'] != null ? json['users']['avatar_url'] : null,
-      contactInfo: json['contact_info'],
-      description: json['bio'],
     );
   }
 }

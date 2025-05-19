@@ -3,9 +3,12 @@ import 'package:photoflow/pages/auth.dart';
 import 'package:photoflow/pages/genres.dart';
 import 'package:photoflow/pages/home.dart';
 import 'package:photoflow/pages/photographer_profile.dart';
+import 'package:photoflow/pages/portfolio_page.dart';
 import 'package:photoflow/pages/poses.dart';
 import 'package:photoflow/pages/recovery.dart';
 import 'package:photoflow/pages/reg.dart';
+import 'package:photoflow/pages/user_profile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -26,7 +29,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Фото Поиск',
+      title: 'PhotoFlow',
       theme: ThemeData(
         primaryColor: const Color(0xFFFFD700), // Золотой цвет #FFD700
         colorScheme: ColorScheme.fromSeed(
@@ -71,7 +74,54 @@ class MyApp extends StatelessWidget {
         '/genres': (context) => const GenresPage(),
         '/photographer_profile': (context) => const PhotographerProfilePage(),
         '/poses': (context) => const PosesPage(),
+        '/user_profile': (context) => const UserProfilePage(),
+        '/portfolio': (context) => const PortfolioPage(),
       },
     );
+  }
+}
+
+class AuthCheckPage extends StatefulWidget {
+  const AuthCheckPage({super.key});
+
+  @override
+  State<AuthCheckPage> createState() => _AuthCheckPageState();
+}
+
+class _AuthCheckPageState extends State<AuthCheckPage> {
+  bool isLoggedIn = false;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+      isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(
+            color: Color(0xFFFFD700),
+          ),
+        ),
+      );
+    }
+    
+    if (isLoggedIn) {
+      return const HomePage();
+    } else {
+      return const AuthPage();
+    }
   }
 }

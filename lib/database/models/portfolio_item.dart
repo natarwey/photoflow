@@ -5,9 +5,11 @@ class PortfolioItem {
   final String imageUrl;
   final String title;
   final int genreId;
-  final int moodId;
+  final int? moodId;
   final int? locationId;
-  final String mood; // Дополнительное поле для отображения
+  String? genreTitle;
+  String? moodTitle;
+  String? locationTitle;
   
   PortfolioItem({
     required this.id,
@@ -16,9 +18,11 @@ class PortfolioItem {
     required this.imageUrl,
     required this.title,
     required this.genreId,
-    required this.moodId,
+    this.moodId,
     this.locationId,
-    required this.mood,
+    this.genreTitle,
+    this.moodTitle,
+    this.locationTitle,
   });
   
   factory PortfolioItem.fromJson(Map<String, dynamic> json) {
@@ -31,7 +35,6 @@ class PortfolioItem {
       genreId: json['genre_id'],
       moodId: json['mood_id'],
       locationId: json['location_id'],
-      mood: json['moods'] != null ? json['moods']['title'] : 'Неизвестное настроение',
     );
   }
 }
