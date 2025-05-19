@@ -17,7 +17,7 @@ class _AuthPageState extends State<AuthPage> {
   TextEditingController passController = TextEditingController();
   AuthService authService = AuthService();
   bool isLoading = false;
-  
+
   @override
   Widget build(BuildContext context) {
     return AppBackground(
@@ -29,9 +29,9 @@ class _AuthPageState extends State<AuthPage> {
             children: [
               Image.asset('images/logo.png'),
               const Text(
-                "Вход", 
+                "Вход",
                 style: TextStyle(
-                  fontSize: 30, 
+                  fontSize: 30,
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
@@ -44,7 +44,10 @@ class _AuthPageState extends State<AuthPage> {
                   cursorColor: const Color(0xFFFFD700),
                   style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.email, color: Color(0xFFFFD700)),
+                    prefixIcon: const Icon(
+                      Icons.email,
+                      color: Color(0xFFFFD700),
+                    ),
                     labelText: 'Почта',
                     labelStyle: const TextStyle(color: Colors.black),
                     focusedBorder: OutlineInputBorder(
@@ -67,7 +70,10 @@ class _AuthPageState extends State<AuthPage> {
                   cursorColor: const Color(0xFFFFD700),
                   style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.password, color: Color(0xFFFFD700)),
+                    prefixIcon: const Icon(
+                      Icons.password,
+                      color: Color(0xFFFFD700),
+                    ),
                     labelText: 'Пароль',
                     labelStyle: const TextStyle(color: Colors.black),
                     focusedBorder: OutlineInputBorder(
@@ -87,7 +93,7 @@ class _AuthPageState extends State<AuthPage> {
                 alignment: Alignment.centerRight,
                 child: InkWell(
                   child: const Text(
-                    "Забыли пароль?", 
+                    "Забыли пароль?",
                     style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
@@ -102,82 +108,83 @@ class _AuthPageState extends State<AuthPage> {
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.6,
                 child: ElevatedButton(
-                  onPressed: isLoading ? null : () async {
-                    if (emailController.text.isEmpty ||
-                        passController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            "Поля пустые!",
-                            style: TextStyle(color: Colors.black),
-                          ),
-                          backgroundColor: Color(0xFFFFD700),
-                        ),
-                      );
-                      return;
-                    }
-                    
-                    setState(() {
-                      isLoading = true;
-                    });
-                    
-                    try {
-                      var user = await authService.signIn(
-                        emailController.text, passController.text);
-                      
-                      if (user != null) {
-                        if (kDebugMode) {
-                          print('Успешный вход: ${user.email}');
-                        }
-                        
-                        // Проверяем, является ли пользователь фотографом
-                        final photographerData = await supabase
-                            .from('photographers')
-                            .select()
-                            .eq('user_id', user.id)
-                            .maybeSingle();
-                        
-                        final isPhotographer = photographerData != null;
-                        
-                        if (kDebugMode) {
-                          print('Пользователь является фотографом: $isPhotographer');
-                        }
-                        
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.setBool('isLoggedIn', true);
-                        await prefs.setBool('isPhotographer', isPhotographer);
-                        
-                        Navigator.popAndPushNamed(context, '/home');
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              "Неверный email или пароль",
-                              style: TextStyle(color: Colors.black),
-                            ),
-                            backgroundColor: Color(0xFFFFD700),
-                          ),
-                        );
-                      }
-                    } catch (e) {
-                      if (kDebugMode) {
-                        print('Ошибка при входе: $e');
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            "Ошибка: $e",
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                          backgroundColor: const Color(0xFFFFD700),
-                        ),
-                      );
-                    } finally {
-                      setState(() {
-                        isLoading = false;
-                      });
-                    }
-                  },
+                  onPressed:
+                      isLoading
+                          ? null
+                          : () async {
+                            if (emailController.text.isEmpty ||
+                                passController.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Поля пустые!",
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                  backgroundColor: Color(0xFFFFD700),
+                                ),
+                              );
+                              return;
+                            }
+
+                            setState(() {
+                              isLoading = true;
+                            });
+
+                            try {
+                              final result = await authService.signIn(
+                                emailController.text,
+                                passController.text,
+                              );
+                              if (result != null && result['success']) {
+                                final user = result['user'];
+                                final bool isPhotographer =
+                                    result['isPhotographer'];
+
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setBool('isLoggedIn', true);
+                                await prefs.setBool(
+                                  'isPhotographer',
+                                  isPhotographer,
+                                );
+
+                                if (kDebugMode) {
+                                  print(
+                                    'Успешный вход: ${user['email']} как ${isPhotographer ? 'фотограф' : 'клиент'}',
+                                  );
+                                }
+
+                                Navigator.popAndPushNamed(context, '/home');
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Неверный email или пароль",
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                    backgroundColor: Color(0xFFFFD700),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              if (kDebugMode) {
+                                print('Ошибка при входе: $e');
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Ошибка: $e",
+                                    style: const TextStyle(color: Colors.black),
+                                  ),
+                                  backgroundColor: const Color(0xFFFFD700),
+                                ),
+                              );
+                            } finally {
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }
+                          },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFD700),
                     foregroundColor: Colors.black,
@@ -186,19 +193,23 @@ class _AuthPageState extends State<AuthPage> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.black,
-                            strokeWidth: 2,
+                  child:
+                      isLoading
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.black,
+                              strokeWidth: 2,
+                            ),
+                          )
+                          : const Text(
+                            "Войти",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        )
-                      : const Text(
-                          "Войти",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
                 ),
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.015),

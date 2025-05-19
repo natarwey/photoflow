@@ -4,30 +4,40 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
   // Вход пользователя
-  Future<User?> signIn(String email, String password) async {
-    try {
-      // Аутентификация пользователя
-      final response = await supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
-      
-      // Если аутентификация прошла успешно, возвращаем пользователя
-      if (response.user != null) {
-        return response.user;
-      }
-      
-      if (kDebugMode) {
-        print('Пользователь не найден в системе аутентификации');
-      }
-      return null;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Ошибка входа: $e');
-      }
-      return null;
+  Future<Map<String, dynamic>?> signIn(String email, String password) async {
+  try {
+    final response = await supabase
+        .from('users')
+        .select()
+        .eq('email', email)
+        .eq('password', password)
+        .single();
+
+    if (response != null) {
+      // Проверяем, является ли пользователь фотографом
+      final photographerData = await supabase
+          .from('photographers')
+          .select()
+          .eq('user_id', response['id'])
+          .maybeSingle();
+
+      final isPhotographer = photographerData != null;
+
+      return {
+        'success': true,
+        'user': response,
+        'isPhotographer': isPhotographer,
+      };
     }
+
+    return null; // Неверные учетные данные
+  } catch (e) {
+    if (kDebugMode) {
+      print('Ошибка входа: $e');
+    }
+    return null;
   }
+}
 
   // Регистрация пользователя
   Future<User?> signUp(String email, String password, String name, {String? surname}) async {
