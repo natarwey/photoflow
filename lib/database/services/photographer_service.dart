@@ -9,6 +9,27 @@ class PhotographerService {
   final UserService _userService = UserService();
   final CityService _cityService = CityService();
 
+  // Получение всех фотографов
+  Future<List<Photographer>> getAllPhotographers() async {
+    try {
+      final photographersData = await supabase
+          .from('photographers')
+          .select();
+      
+      List<Photographer> photographers = photographersData.map<Photographer>((item) => Photographer.fromJson(item)).toList();
+      
+      // Загружаем дополнительную информацию для каждого фотографа
+      await _loadAdditionalInfo(photographers);
+      
+      return photographers;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Ошибка при получении всех фотографов: $e');
+      }
+      return [];
+    }
+  }
+  
   // Получение фотографов по жанру
   Future<List<Photographer>> getPhotographersByGenre(int genreId) async {
     try {

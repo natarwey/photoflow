@@ -31,6 +31,7 @@ class _GenresPageState extends State<GenresPage> {
   double maxPrice = 10000;
   bool isLoadingPhotographers = true;
   bool isLoadingPortfolio = true;
+  int _currentTabIndex = 0;
   
   @override
   void initState() {
@@ -52,7 +53,8 @@ class _GenresPageState extends State<GenresPage> {
     });
     
     try {
-      final photographersList = await _photographerService.getPhotographersByGenre(genreId);
+      // Загружаем всех фотографов
+      final photographersList = await _photographerService.getAllPhotographers();
       setState(() {
         photographers = photographersList;
         
@@ -125,6 +127,12 @@ class _GenresPageState extends State<GenresPage> {
           (photographer.price! >= priceRange.start && photographer.price! <= priceRange.end);
       
       return (nameMatches || surnameMatches) && cityMatches && priceMatches;
+    }).toList();
+  }
+
+  List<PortfolioItem> get filteredPortfolioItems {
+    return portfolioItems.where((item) {
+      return item.title.toLowerCase().contains(searchQuery.toLowerCase());
     }).toList();
   }
   
@@ -406,7 +414,7 @@ class _GenresPageState extends State<GenresPage> {
                       });
                     },
                     decoration: InputDecoration(
-                      hintText: 'Поиск фотографов',
+                      hintText: _currentTabIndex == 0 ? 'Поиск фотографов' : 'Поиск фотографий',
                       prefixIcon: const Icon(
                         Icons.search,
                         color: Color(0xFFFFD700),
@@ -450,8 +458,8 @@ class _GenresPageState extends State<GenresPage> {
                 children: [
                   Container(
                     color: Colors.white,
-                    child: const TabBar(
-                      tabs: [
+                    child: TabBar(
+                      tabs: const [
                         Tab(
                           icon: Icon(Icons.person),
                           text: 'Фотографы',
@@ -461,9 +469,16 @@ class _GenresPageState extends State<GenresPage> {
                           text: 'Фотографии',
                         ),
                       ],
-                      labelColor: Color(0xFFFFD700),
+                      labelColor: const Color(0xFFFFD700),
                       unselectedLabelColor: Colors.black54,
-                      indicatorColor: Color(0xFFFFD700),
+                      indicatorColor: const Color(0xFFFFD700),
+                      onTap: (index) {
+                        setState(() {
+                          _currentTabIndex = index;
+                          // Сбрасываем поисковый запрос при переключении вкладок
+                          searchQuery = '';
+                        });
+                      },
                     ),
                   ),
                   Expanded(
@@ -607,7 +622,7 @@ class _GenresPageState extends State<GenresPage> {
                                   color: Color(0xFFFFD700),
                                 ),
                               )
-                            : portfolioItems.isEmpty
+                            : filteredPortfolioItems.isEmpty
                                 ? const Center(
                                     child: Text(
                                       'Фотографии не найдены',
@@ -625,9 +640,9 @@ class _GenresPageState extends State<GenresPage> {
                                       crossAxisSpacing: 16,
                                       mainAxisSpacing: 16,
                                     ),
-                                    itemCount: portfolioItems.length,
+                                    itemCount: filteredPortfolioItems.length,
                                     itemBuilder: (context, index) {
-                                      final item = portfolioItems[index];
+                                      final item = filteredPortfolioItems[index];
                                       return InkWell(
                                         onTap: () => _showPortfolioItemDetails(item),
                                         child: Card(

@@ -4,6 +4,7 @@ import 'package:photoflow/database/models/photographer.dart';
 import 'package:photoflow/database/models/user.dart' as app_user;
 import 'package:photoflow/database/services/photographer_service.dart';
 import 'package:photoflow/database/services/user_service.dart';
+import 'package:photoflow/main.dart';
 import 'package:photoflow/pages/drawer.dart';
 
 class UserProfilePage extends StatefulWidget {
@@ -33,12 +34,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
     });
     
     try {
-      // Получаем текущего пользователя
-      final currentUser = await _userService.getCurrentUser();
+      // Получаем текущего пользователя из Supabase Auth
+      final currentUser = supabase.auth.currentUser;
       
       if (currentUser != null) {
+        // Получаем данные пользователя из таблицы users
+        final userData = await supabase
+            .from('users')
+            .select()
+            .eq('id', currentUser.id)
+            .single();
+        
         setState(() {
-          user = currentUser;
+          user = app_user.User.fromJson(userData);
         });
         
         // Проверяем, является ли пользователь фотографом

@@ -34,25 +34,35 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     });
     
     try {
-      final user = await _userService.getCurrentUser();
+      // Получаем текущего пользователя из Supabase Auth
+      final currentUser = supabase.auth.currentUser;
       
-      if (user != null) {
-        setState(() {
-          userName = '${user.name} ${user.surname ?? ''}';
-          userEmail = user.email;
-          avatarUrl = user.avatarUrl;
-          isLoading = false;
-        });
+      if (currentUser != null) {
+        // Получаем данные пользователя из таблицы users
+        final userData = await supabase
+            .from('users')
+            .select()
+            .eq('id', currentUser.id)
+            .single();
+        
+        if (userData != null) {
+          setState(() {
+            userName = '${userData['name']} ${userData['surname'] ?? ''}';
+            userEmail = userData['email'];
+            avatarUrl = userData['avatar_url'];
+          });
+        }
         
         // Проверяем, является ли пользователь фотографом
         final photographerData = await supabase
             .from('photographers')
             .select()
-            .eq('user_id', user.id)
+            .eq('user_id', currentUser.id)
             .maybeSingle();
         
         setState(() {
           isPhotographer = photographerData != null;
+          isLoading = false;
         });
         
         // Сохраняем статус фотографа в SharedPreferences
