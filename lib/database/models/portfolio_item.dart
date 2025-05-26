@@ -10,6 +10,8 @@ class PortfolioItem {
   String? genreTitle;
   String? moodTitle;
   String? locationTitle;
+  final String? photographerSurname;
+  final String? photographerName;
   
   PortfolioItem({
     required this.id,
@@ -23,6 +25,8 @@ class PortfolioItem {
     this.genreTitle,
     this.moodTitle,
     this.locationTitle,
+    this.photographerSurname,
+    this.photographerName,
   });
   
   factory PortfolioItem.fromJson(Map<String, dynamic> json) {

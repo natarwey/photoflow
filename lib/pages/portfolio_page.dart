@@ -261,40 +261,88 @@ class _PortfolioPageState extends State<PortfolioPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ClipRRect(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(12),
-                              ),
-                              child: Image.network(
-                                item.imageUrl,
-                                height: 150,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    height: 150,
-                                    color: Colors.grey[300],
-                                    child: const Center(
-                                      child: Icon(
+                            // Квадратное фото
+                            SizedBox(
+                              height: 200,
+                              width: double.infinity,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(12),
+                                ),
+                                child: Image.network(
+                                  item.imageUrl,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Color(0xFFFFD700),
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: Colors.grey[300],
+                                      child: const Icon(
                                         Icons.error_outline,
                                         color: Color(0xFFFFD700),
                                         size: 40,
                                       ),
-                                    ),
-                                  );
-                                },
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                item.title,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.title,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        '${item.photographerSurname ?? ''} ${item.photographerName ?? ''}',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/photographer_profile',
+                                            arguments: item.photographerId,
+                                          );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFFFFD700),
+                                          foregroundColor: Colors.black,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 2,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          textStyle: const TextStyle(fontSize: 10),
+                                        ),
+                                        child: const Text('Профиль'),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
                           ],
