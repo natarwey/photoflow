@@ -1,83 +1,104 @@
 import 'package:flutter/foundation.dart';
 import 'package:photoflow/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
   // Вход пользователя
-  Future<Map<String, dynamic>?> signIn(String email, String password) async {
+  Future<Map<String, dynamic>?> signIn(String email, String password, {bool isPhotographer = false}) async {
   try {
-    final response = await supabase
+    // Получаем пользователя из таблицы users
+    final userData = await supabase
         .from('users')
         .select()
         .eq('email', email)
         .eq('password', password)
         .single();
 
-    if (response != null) {
-      // Проверяем, является ли пользователь фотографом
+    if (userData == null) {
+      return null; // Неверные учетные данные
+    }
+
+    bool userIsPhotographer = false;
+
+    if (isPhotographer) {
+      // Проверяем, есть ли запись в таблице photographers
       final photographerData = await supabase
           .from('photographers')
           .select()
-          .eq('user_id', response['id'])
+          .eq('user_id', userData['id'])
           .maybeSingle();
 
-      final isPhotographer = photographerData != null;
+      if (photographerData == null) {
+        // У пользователя нет аккаунта фотографа
+        return {'success': false, 'error': 'Вы выбрали "Фотограф", но у вас нет аккаунта фотографа'};
+      }
 
-      return {
-        'success': true,
-        'user': response,
-        'isPhotographer': isPhotographer,
-      };
+      userIsPhotographer = true;
     }
 
-    return null; // Неверные учетные данные
+    // Сохраняем данные в SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userId', userData['id']);
+    await prefs.setBool('isLoggedIn', true);
+    await prefs.setBool('isPhotographer', userIsPhotographer);
+
+    return {
+      'success': true,
+      'user': userData,
+      'isPhotographer': userIsPhotographer,
+    };
   } catch (e) {
     if (kDebugMode) {
-      print('Ошибка входа: $e');
+      print('Ошибка при входе: $e');
     }
-    return null;
+    return {'success': false, 'error': e.toString()};
   }
 }
 
   // Регистрация пользователя
-  Future<User?> signUp(String email, String password, String name, {String? surname}) async {
-    try {
-      // Регистрация пользователя в системе аутентификации Supabase
-      final response = await supabase.auth.signUp(
-        email: email,
-        password: password,
-      );
-      
-      if (response.user == null) {
-        return null;
-      }
-      
-      // Добавляем пользователя в таблицу users
-      await supabase.from('users').insert({
-        'id': response.user!.id,
-        'email': email,
-        'name': name,
-        'surname': surname,
-        'password': password,
-        'created_at': DateTime.now().toIso8601String(),
-      });
-      
-      if (kDebugMode) {
-        print('Пользователь успешно добавлен в таблицу users');
-      }
-      
-      return response.user;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Ошибка регистрации: $e');
-      }
-      // Если произошла ошибка, пытаемся выйти из системы, чтобы не оставлять "висящую" аутентификацию
-      try {
-        await supabase.auth.signOut();
-      } catch (_) {}
-      return null;
+  Future<Map<String, dynamic>?> signUp(String email, String password, String name, {String? surname}) async {
+  try {
+    // Проверяем, существует ли уже пользователь с таким email
+    final existingUser = await supabase
+        .from('users')
+        .select()
+        .eq('email', email)
+        .single();
+
+    if (existingUser != null) {
+      return {'success': false, 'error': 'Пользователь с таким email уже существует'};
     }
+
+    // Создаем нового пользователя
+    final newUser = await supabase.from('users').insert({
+      'email': email,
+      'password': password,
+      'name': name,
+      'surname': surname,
+      'created_at': DateTime.now().toIso8601String(),
+    }).select().single();
+
+    if (newUser != null) {
+      // Сохраняем данные нового пользователя в SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('userId', newUser['id']);
+      await prefs.setBool('isLoggedIn', true);
+
+      return {
+        'success': true,
+        'user': newUser,
+      };
+    }
+
+    return null;
+  } catch (e) {
+    if (kDebugMode) {
+      print('Ошибка регистрации: $e');
+    }
+    return null;
   }
+}
   
   // Создание аккаунта фотографа
   Future<bool> createPhotographerAccount(String userId, int cityId, {String? bio, int? experience, int price = 0, String? socialLinks}) async {

@@ -257,7 +257,7 @@ class _RegPageState extends State<RegPage> {
                           const SnackBar(
                             content: Text(
                               "Поля пустые",
-                              style: TextStyle(color: Colors.black),
+                              style: TextStyle(col  or: Colors.black),
                             ),
                             backgroundColor: Color(0xFFFFD700),
                           ),

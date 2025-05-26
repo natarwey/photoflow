@@ -17,6 +17,7 @@ class _AuthPageState extends State<AuthPage> {
   TextEditingController passController = TextEditingController();
   AuthService authService = AuthService();
   bool isLoading = false;
+  bool _isPhotographer = false;
 
   @override
   Widget build(BuildContext context) {

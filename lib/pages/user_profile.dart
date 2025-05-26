@@ -29,45 +29,55 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   Future<void> _loadUserData() async {
+  setState(() {
+    isLoading = true;
+  });
+  try {
+    final currentUser = supabase.auth.currentUser;
+
+    if (currentUser == null) {
+      throw Exception("Пользователь не авторизован");
+    }
+
+    final userData = await supabase
+        .from('users')
+        .select()
+        .eq('id', currentUser.id)
+        .single();
+
+    if (userData == null || userData.isEmpty) {
+      throw Exception("Данные пользователя пустые");
+    }
+
     setState(() {
-      isLoading = true;
+      user = app_user.User.fromJson(userData);
     });
-    
-    try {
-      // Получаем текущего пользователя из Supabase Auth
-      final currentUser = supabase.auth.currentUser;
-      
-      if (currentUser != null) {
-        // Получаем данные пользователя из таблицы users
-        final userData = await supabase
-            .from('users')
-            .select()
-            .eq('id', currentUser.id)
-            .single();
-        
-        setState(() {
-          user = app_user.User.fromJson(userData);
-        });
-        
-        // Проверяем, является ли пользователь фотографом
-        final photographerData = await _photographerService.getPhotographerByUserId(currentUser.id);
-        
-        if (photographerData != null) {
-          setState(() {
-            photographer = photographerData;
-          });
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Ошибка при загрузке данных пользователя: $e');
-      }
-    } finally {
+
+    // Можно вывести в лог, чтобы убедиться, что данные пришли
+    print("Данные пользователя: $userData");
+
+    // Загружаем данные фотографа, если нужно
+    final photographerData = await _photographerService.getPhotographerByUserId(currentUser.id);
+    if (photographerData != null) {
       setState(() {
-        isLoading = false;
+        photographer = photographerData;
       });
     }
+
+  } catch (e) {
+    print('Ошибка при загрузке данных пользователя: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Ошибка загрузки профиля: $e'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  } finally {
+    setState(() {
+      isLoading = false;
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {
