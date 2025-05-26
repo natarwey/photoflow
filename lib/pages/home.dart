@@ -72,6 +72,176 @@ class _HomePageState extends State<HomePage> {
       print('Ошибка при загрузке жанров: $e');
     }
   }
+
+  // Метод для открытия карточки фотографии
+  void _showPortfolioItemDetails(PortfolioItem item) {
+    print('DEBUG: Открываем детали фото:');
+  print('Название: ${item.title}');
+  print('Фотограф: ${item.photographerSurname} ${item.photographerName}');
+  print('Жанр: ${item.genreTitle}');
+  print('Настроение: ${item.moodTitle}');
+  print('Локация: ${item.locationTitle}');
+  
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        insetPadding: const EdgeInsets.all(16),
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  children: [
+                    Image.network(
+                      item.imageUrl,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 300,
+                          color: Colors.grey[300],
+                          child: const Center(
+                            child: Icon(
+                              Icons.error_outline,
+                              color: Color(0xFFFFD700),
+                              size: 50,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.title,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      if (item.photographerSurname != null || item.photographerName != null)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${item.photographerSurname ?? ''} ${item.photographerName ?? ''}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/photographer_profile',
+                                  arguments: item.photographerId,
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFFD700),
+                                foregroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                                textStyle: const TextStyle(fontSize: 10),
+                              ),
+                              child: const Text('Профиль'),
+                            ),
+                          ],
+                        ),
+                      const SizedBox(height: 8),
+                      if (item.genreTitle != null)
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.photo_album,
+                              color: Color(0xFFFFD700),
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Жанр: ${item.genreTitle}',
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      const SizedBox(height: 4),
+                      if (item.moodTitle != null)
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.mood,
+                              color: Color(0xFFFFD700),
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Настроение: ${item.moodTitle}',
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      const SizedBox(height: 4),
+                      if (item.locationTitle != null)
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on,
+                              color: Color(0xFFFFD700),
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Локация: ${item.locationTitle}',
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
   
   @override
   Widget build(BuildContext context) {
@@ -103,62 +273,64 @@ class _HomePageState extends State<HomePage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
-              if (currentIdea != null) ...[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.network(
-                    currentIdea!.imageUrl,
-                    height: 250,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        height: 250,
-                        width: double.infinity,
-                        color: Colors.grey[300],
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: Color(0xFFFFD700),
-                          ),
+
+              // Картинка идеи
+              if (currentIdea != null)
+                GestureDetector(
+                  onTap: () => _showPortfolioItemDetails(currentIdea!),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
                         ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 250,
-                        width: double.infinity,
-                        color: Colors.grey[300],
-                        child: const Center(
-                          child: Icon(
-                            Icons.error_outline,
-                            color: Color(0xFFFFD700),
-                            size: 50,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFD700).withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFFFD700)),
-                  ),
-                  child: Text(
-                    currentIdea!.moodTitle ?? 'Нет настроения',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      ],
                     ),
-                    textAlign: TextAlign.center,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Stack(
+                        alignment: Alignment.bottomCenter,
+                        children: [
+                          Image.network(
+                            currentIdea!.imageUrl,
+                            height: 250,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                height: 250,
+                                color: Colors.grey[300],
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Color(0xFFFFD700),
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: 250,
+                                color: Colors.grey[300],
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.error_outline,
+                                    color: Color(0xFFFFD700),
+                                    size: 50,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ] else ...[
+                )
+              else
                 Container(
                   height: 250,
                   width: double.infinity,
@@ -172,7 +344,26 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-              ],
+
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFD700).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFFFD700)),
+                ),
+                child: Text(
+                  currentIdea?.moodTitle ?? 'Нет настроения',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
               const SizedBox(height: 40),
               const Text(
                 'Выбрать фотографа по жанру',
@@ -184,6 +375,7 @@ class _HomePageState extends State<HomePage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
+
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

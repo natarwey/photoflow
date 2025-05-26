@@ -30,15 +30,20 @@ class PortfolioItem {
   });
   
   factory PortfolioItem.fromJson(Map<String, dynamic> json) {
+    final photographer = json['photographers'] as Map<String, dynamic>? ?? {};
+
     return PortfolioItem(
       id: json['id'],
-      createdAt: DateTime.parse(json['created_at']),
-      photographerId: json['photographer_id'],
       imageUrl: json['image_url'],
       title: json['title'],
-      genreId: json['genre_id'],
-      moodId: json['mood_id'],
-      locationId: json['location_id'],
+      photographerId: json['photographer_id'],
+
+      photographerName: photographer['name'],
+      photographerSurname: photographer['surname'],
+
+      genreTitle: json['genres']?['title'],
+      moodTitle: json['moods']?['title'],
+      locationTitle: json['locations']?['title'],
     );
   }
 }

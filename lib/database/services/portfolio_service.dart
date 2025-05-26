@@ -9,7 +9,13 @@ class PortfolioService {
     try {
       final response = await supabase
           .from('portfolio_items')
-          .select('*, moods:mood_id(title)')
+          .select('''
+      *,
+      photographers(id, name, surname),
+      genres!inner(id, title),
+      moods!inner(id, title),
+      locations!inner(id, title)
+    ''')
           .order('id')
           .limit(50);
       
