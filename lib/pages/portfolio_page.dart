@@ -4,6 +4,7 @@ import 'package:photoflow/database/models/photographer.dart';
 import 'package:photoflow/database/models/portfolio_item.dart';
 import 'package:photoflow/database/services/photographer_service.dart';
 import 'package:photoflow/database/services/portfolio_service.dart';
+import 'package:photoflow/main.dart';
 
 class PortfolioPage extends StatefulWidget {
   const PortfolioPage({super.key});
@@ -15,7 +16,7 @@ class PortfolioPage extends StatefulWidget {
 class _PortfolioPageState extends State<PortfolioPage> {
   final PhotographerService _photographerService = PhotographerService();
   final PortfolioService _portfolioService = PortfolioService();
-  
+
   Photographer? photographer;
   List<PortfolioItem> portfolioItems = [];
   bool isLoading = true;
@@ -27,18 +28,21 @@ class _PortfolioPageState extends State<PortfolioPage> {
     _loadData(photographerId);
   }
 
-  Future<void> _loadData(int photographerId) async {
+  Future<void> _loadData(photographerId) async {
     setState(() {
       isLoading = true;
     });
-    
+
     try {
       // Загружаем данные фотографа
-      final photographerData = await _photographerService.getPhotographerById(photographerId);
-      
-      // Загружаем портфолио фотографа
-      final portfolioData = await _portfolioService.getPortfolioByPhotographerId(photographerId);
-      
+      final photographerData = await _photographerService.getPhotographerById(
+        photographerId,
+      );
+
+      // Загружаем портфолио фотографаЫ
+      final portfolioData = await _portfolioService
+          .getPortfolioByPhotographerId(photographerId);
+
       setState(() {
         photographer = photographerData;
         portfolioItems = portfolioData;
@@ -47,10 +51,81 @@ class _PortfolioPageState extends State<PortfolioPage> {
     } catch (e) {
       if (kDebugMode) {
         print('Ошибка при загрузке данных: $e');
+        setState(() {
+          isLoading = false;
+        });
       }
-      setState(() {
-        isLoading = false;
-      });
+    }
+  }
+
+  Future<void> _loadAdditionalInfo(List<PortfolioItem> items) async {
+    if (items.isEmpty) return;
+
+    try {
+      Set<int> genreIds = items.map((item) => item.genreId).toSet();
+      Set<int?> moodIds =
+          items
+              .map((item) => item.moodId)
+              .where((id) => id != null)
+              .cast<int>()
+              .toSet();
+      Set<int?> locationIds =
+          items
+              .map((item) => item.locationId)
+              .where((id) => id != null)
+              .cast<int>()
+              .toSet();
+
+      // Загружаем жанры
+      if (genreIds.isNotEmpty) {
+        final genresResponse = await supabase
+            .from('genres')
+            .select()
+            .inFilter('id', genreIds.toList());
+        Map<int, String> genreMap = {};
+        for (var genre in genresResponse) {
+          genreMap[genre['id'] as int] = genre['title'] as String;
+        }
+        for (var item in items) {
+          item.genreTitle = genreMap[item.genreId];
+        }
+      }
+
+      // Загружаем настроения
+      if (moodIds.isNotEmpty) {
+        final moodsResponse = await supabase
+            .from('mood')
+            .select()
+            .inFilter('id', moodIds.toList());
+        Map<int, String> moodMap = {};
+        for (var mood in moodsResponse) {
+          moodMap[mood['id'] as int] = mood['title'] as String;
+        }
+        for (var item in items) {
+          if (item.moodId != null) {
+            item.moodTitle = moodMap[item.moodId];
+          }
+        }
+      }
+
+      // Загружаем локации
+      if (locationIds.isNotEmpty) {
+        final locationsResponse = await supabase
+            .from('location')
+            .select()
+            .inFilter('id', locationIds.toList());
+        Map<int, String> locationMap = {};
+        for (var location in locationsResponse) {
+          locationMap[location['id'] as int] = location['title'] as String;
+        }
+        for (var item in items) {
+          if (item.locationId != null) {
+            item.locationTitle = locationMap[item.locationId];
+          }
+        }
+      }
+    } catch (e) {
+      print('Ошибка при загрузке дополнительной информации: $e');
     }
   }
 
@@ -115,7 +190,14 @@ class _PortfolioPageState extends State<PortfolioPage> {
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${item.photographerSurname ?? ''} ${item.photographerName ?? ''}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -129,10 +211,8 @@ class _PortfolioPageState extends State<PortfolioPage> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Жанр: ${item.genreTitle}',
-                                style: TextStyle(
-                                  color: Colors.grey[700],
-                                ),
+                                'Жанр: ${item.genreTitle ?? "Не указан"}',
+                                style: TextStyle(color: Colors.grey[700]),
                               ),
                             ],
                           ),
@@ -148,10 +228,8 @@ class _PortfolioPageState extends State<PortfolioPage> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Настроение: ${item.moodTitle}',
-                                style: TextStyle(
-                                  color: Colors.grey[700],
-                                ),
+                                'Настроение: ${item.moodTitle ?? "Не указано"}',
+                                style: TextStyle(color: Colors.grey[700]),
                               ),
                             ],
                           ),
@@ -167,10 +245,8 @@ class _PortfolioPageState extends State<PortfolioPage> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Локация: ${item.locationTitle}',
-                                style: TextStyle(
-                                  color: Colors.grey[700],
-                                ),
+                                'Локация: ${item.locationTitle ?? "Не указана"}',
+                                style: TextStyle(color: Colors.grey[700]),
                               ),
                             ],
                           ),
@@ -192,156 +268,103 @@ class _PortfolioPageState extends State<PortfolioPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFEEEEEE),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFFD700),
         title: Text(
           photographer != null
               ? 'Портфолио ${photographer!.name ?? ''} ${photographer!.surname ?? ''}'
               : 'Портфолио',
-          style: const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
         ),
+        backgroundColor: const Color(0xFFFFD700),
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(
-                color: Color(0xFFFFD700),
-              ),
-            )
-          : portfolioItems.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.photo_library_outlined,
-                        size: 80,
-                        color: Color(0xFFFFD700),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Портфолио пусто',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Фотограф еще не добавил работы',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                    ],
-                  ),
-                )
+      body:
+          isLoading
+              ? const Center(
+                child: CircularProgressIndicator(color: Color(0xFFFFD700)),
+              )
+              : portfolioItems.isEmpty
+              ? const Center(child: Text('Портфолио пустое'))
               : GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.75,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                  ),
-                  itemCount: portfolioItems.length,
-                  itemBuilder: (context, index) {
-                    final item = portfolioItems[index];
-                    return InkWell(
-                      onTap: () => _showPortfolioItemDetails(item),
-                      child: Card(
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Квадратное фото
-                            SizedBox(
-                              height: 200,
-                              width: double.infinity,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(12),
-                                ),
-                                child: Image.network(
-                                  item.imageUrl,
-                                  fit: BoxFit.cover,
-                                  loadingBuilder: (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return const Center(
-                                      child: CircularProgressIndicator(
-                                        color: Color(0xFFFFD700),
-                                      ),
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      color: Colors.grey[300],
-                                      child: const Icon(
-                                        Icons.error_outline,
-                                        color: Color(0xFFFFD700),
-                                        size: 40,
-                                      ),
-                                    );
-                                  },
-                                ),
+                padding: const EdgeInsets.all(16),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.75,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
+                itemCount: portfolioItems.length,
+                itemBuilder: (context, index) {
+                  final item = portfolioItems[index];
+                  return InkWell(
+                    onTap: () => _showPortfolioItemDetails(item),
+                    child: Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Квадратное фото
+                          SizedBox(
+                            height: 200,
+                            width: double.infinity,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(12),
+                              ),
+                              child: Image.network(
+                                item.imageUrl,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (
+                                  context,
+                                  child,
+                                  loadingProgress,
+                                ) {
+                                  if (loadingProgress == null) return child;
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Color(0xFFFFD700),
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey[300],
+                                    child: const Icon(
+                                      Icons.error_outline,
+                                      color: Color(0xFFFFD700),
+                                      size: 40,
+                                    ),
+                                  );
+                                },
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.title,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.title,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
                                   ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        '${item.photographerSurname ?? ''} ${item.photographerName ?? ''}',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.pushNamed(
-                                            context,
-                                            '/photographer_profile',
-                                            arguments: item.photographerId,
-                                          );
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xFFFFD700),
-                                          foregroundColor: Colors.black,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 2,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          textStyle: const TextStyle(fontSize: 10),
-                                        ),
-                                        child: const Text('Профиль'),
-                                      ),
-                                    ],
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${item.photographerSurname ?? ''} ${item.photographerName ?? ''}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black54,
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                                 ],
                               ),
                             ),

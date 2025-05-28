@@ -7,6 +7,7 @@ import 'package:photoflow/database/models/portfolio_item.dart';
 import 'package:photoflow/database/services/city_service.dart';
 import 'package:photoflow/database/services/photographer_service.dart';
 import 'package:photoflow/database/services/portfolio_service.dart';
+import 'package:photoflow/main.dart';
 
 class GenresPage extends StatefulWidget {
   const GenresPage({super.key});
@@ -23,7 +24,7 @@ class _GenresPageState extends State<GenresPage> {
   List<Photographer> photographers = [];
   List<PortfolioItem> portfolioItems = [];
   List<City> cities = [];
-  
+
   String searchQuery = '';
   City? selectedCity;
   RangeValues priceRange = const RangeValues(0, 10000);
@@ -32,13 +33,13 @@ class _GenresPageState extends State<GenresPage> {
   bool isLoadingPhotographers = true;
   bool isLoadingPortfolio = true;
   int _currentTabIndex = 0;
-  
+
   @override
   void initState() {
     super.initState();
     _loadCities();
   }
-  
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -46,32 +47,34 @@ class _GenresPageState extends State<GenresPage> {
     _loadPhotographers(genre.id);
     _loadPortfolioItems(genre.id);
   }
-  
+
   Future<void> _loadPhotographers(int genreId) async {
     setState(() {
       isLoadingPhotographers = true;
     });
-    
+
     try {
       // Загружаем всех фотографов
-      final photographersList = await _photographerService.getAllPhotographers();
+      final photographersList =
+          await _photographerService.getAllPhotographers();
       setState(() {
         photographers = photographersList;
-        
+
         // Определение минимальной и максимальной цены
         if (photographers.isNotEmpty) {
-          List<int> prices = photographers
-              .where((p) => p.price != null)
-              .map((p) => p.price!)
-              .toList();
-          
+          List<int> prices =
+              photographers
+                  .where((p) => p.price != null)
+                  .map((p) => p.price!)
+                  .toList();
+
           if (prices.isNotEmpty) {
             minPrice = prices.reduce((a, b) => a < b ? a : b).toDouble();
             maxPrice = prices.reduce((a, b) => a > b ? a : b).toDouble();
             priceRange = RangeValues(minPrice, maxPrice);
           }
         }
-        
+
         isLoadingPhotographers = false;
       });
     } catch (e) {
@@ -88,9 +91,10 @@ class _GenresPageState extends State<GenresPage> {
     setState(() {
       isLoadingPortfolio = true;
     });
-    
+
     try {
       final items = await _portfolioService.getPortfolioByGenre(genreId);
+      await _loadAdditionalInfo(items);
       setState(() {
         portfolioItems = items;
         isLoadingPortfolio = false;
@@ -104,7 +108,82 @@ class _GenresPageState extends State<GenresPage> {
       });
     }
   }
-  
+
+  Future<void> _loadAdditionalInfo(List<PortfolioItem> items) async {
+    if (items.isEmpty) return;
+    try {
+      // Загружаем уникальные ID жанров, настроений и локаций
+      Set<int> genreIds = items.map((item) => item.genreId).toSet();
+      Set<int?> moodIds =
+          items
+              .map((item) => item.moodId)
+              .where((id) => id != null)
+              .cast<int>()
+              .toSet();
+      Set<int?> locationIds =
+          items
+              .map((item) => item.locationId)
+              .where((id) => id != null)
+              .cast<int>()
+              .toSet();
+
+      // Загружаем жанры
+      if (genreIds.isNotEmpty) {
+        final genresResponse = await supabase
+            .from('genres')
+            .select()
+            .inFilter('id', genreIds.toList());
+        Map<int, String> genreMap = {};
+        for (var genre in genresResponse) {
+          genreMap[genre['id'] as int] = genre['title'] as String;
+        }
+        for (var item in items) {
+          item.genreTitle = genreMap[item.genreId];
+        }
+      }
+
+      // Загружаем настроения
+      if (moodIds.isNotEmpty) {
+        final moodsResponse = await supabase
+            .from('mood')
+            .select()
+            .inFilter('id', moodIds.toList());
+
+        Map<int, String> moodMap = {};
+        for (var mood in moodsResponse) {
+          moodMap[mood['id'] as int] = mood['title'] as String;
+        }
+
+        for (var item in items) {
+          if (item.moodId != null) {
+            item.moodTitle = moodMap[item.moodId];
+          }
+        }
+      }
+
+      // Загружаем локации
+      if (locationIds.isNotEmpty) {
+        final locationsResponse = await supabase
+            .from('location')
+            .select()
+            .inFilter('id', locationIds.toList());
+
+        Map<int, String> locationMap = {};
+        for (var location in locationsResponse) {
+          locationMap[location['id'] as int] = location['title'] as String;
+        }
+
+        for (var item in items) {
+          if (item.locationId != null) {
+            item.locationTitle = locationMap[item.locationId];
+          }
+        }
+      }
+    } catch (e) {
+      print('Ошибка при загрузке дополнительной информации: $e');
+    }
+  }
+
   Future<void> _loadCities() async {
     try {
       final citiesList = await _cityService.getCities();
@@ -115,17 +194,24 @@ class _GenresPageState extends State<GenresPage> {
       print('Ошибка при загрузке городов: $e');
     }
   }
-  
+
   List<Photographer> get filteredPhotographers {
     return photographers.where((photographer) {
-      final nameMatches = photographer.name != null && 
+      final nameMatches =
+          photographer.name != null &&
           photographer.name!.toLowerCase().contains(searchQuery.toLowerCase());
-      final surnameMatches = photographer.surname != null && 
-          photographer.surname!.toLowerCase().contains(searchQuery.toLowerCase());
-      final cityMatches = selectedCity == null || photographer.cityId == selectedCity!.id;
-      final priceMatches = photographer.price == null || 
-          (photographer.price! >= priceRange.start && photographer.price! <= priceRange.end);
-      
+      final surnameMatches =
+          photographer.surname != null &&
+          photographer.surname!.toLowerCase().contains(
+            searchQuery.toLowerCase(),
+          );
+      final cityMatches =
+          selectedCity == null || photographer.cityId == selectedCity!.id;
+      final priceMatches =
+          photographer.price == null ||
+          (photographer.price! >= priceRange.start &&
+              photographer.price! <= priceRange.end);
+
       return (nameMatches || surnameMatches) && cityMatches && priceMatches;
     }).toList();
   }
@@ -135,7 +221,7 @@ class _GenresPageState extends State<GenresPage> {
       return item.title.toLowerCase().contains(searchQuery.toLowerCase());
     }).toList();
   }
-  
+
   void _showFilterDialog() {
     showDialog(
       context: context,
@@ -226,9 +312,7 @@ class _GenresPageState extends State<GenresPage> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.black,
-                  ),
+                  style: TextButton.styleFrom(foregroundColor: Colors.black),
                   child: const Text('Отмена'),
                 ),
                 ElevatedButton(
@@ -249,7 +333,7 @@ class _GenresPageState extends State<GenresPage> {
       },
     );
   }
-  
+
   void _showPortfolioItemDetails(PortfolioItem item) {
     showDialog(
       context: context,
@@ -311,7 +395,14 @@ class _GenresPageState extends State<GenresPage> {
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${item.photographerSurname ?? ''} ${item.photographerName ?? ''}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -325,10 +416,8 @@ class _GenresPageState extends State<GenresPage> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Жанр: ${item.genreTitle}',
-                                style: TextStyle(
-                                  color: Colors.grey[700],
-                                ),
+                                'Жанр: ${item.genreTitle ?? "Не указан"}',
+                                style: TextStyle(color: Colors.grey[700]),
                               ),
                             ],
                           ),
@@ -344,10 +433,8 @@ class _GenresPageState extends State<GenresPage> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Настроение: ${item.moodTitle}',
-                                style: TextStyle(
-                                  color: Colors.grey[700],
-                                ),
+                                'Настроение: ${item.moodTitle ?? "Не указано"}',
+                                style: TextStyle(color: Colors.grey[700]),
                               ),
                             ],
                           ),
@@ -363,10 +450,8 @@ class _GenresPageState extends State<GenresPage> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Локация: ${item.locationTitle}',
-                                style: TextStyle(
-                                  color: Colors.grey[700],
-                                ),
+                                'Локация: ${item.locationTitle ?? "Не указана"}',
+                                style: TextStyle(color: Colors.grey[700]),
                               ),
                             ],
                           ),
@@ -386,7 +471,7 @@ class _GenresPageState extends State<GenresPage> {
   @override
   Widget build(BuildContext context) {
     final genre = ModalRoute.of(context)!.settings.arguments as Genre;
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFFEEEEEE),
       appBar: AppBar(
@@ -414,7 +499,10 @@ class _GenresPageState extends State<GenresPage> {
                       });
                     },
                     decoration: InputDecoration(
-                      hintText: _currentTabIndex == 0 ? 'Поиск фотографов' : 'Поиск фотографий',
+                      hintText:
+                          _currentTabIndex == 0
+                              ? 'Поиск фотографов'
+                              : 'Поиск фотографий',
                       prefixIcon: const Icon(
                         Icons.search,
                         color: Color(0xFFFFD700),
@@ -442,10 +530,7 @@ class _GenresPageState extends State<GenresPage> {
                       color: const Color(0xFFFFD700),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
-                      Icons.filter_list,
-                      color: Colors.black,
-                    ),
+                    child: const Icon(Icons.filter_list, color: Colors.black),
                   ),
                 ),
               ],
@@ -460,10 +545,7 @@ class _GenresPageState extends State<GenresPage> {
                     color: Colors.white,
                     child: TabBar(
                       tabs: const [
-                        Tab(
-                          icon: Icon(Icons.person),
-                          text: 'Фотографы',
-                        ),
+                        Tab(icon: Icon(Icons.person), text: 'Фотографы'),
                         Tab(
                           icon: Icon(Icons.photo_library),
                           text: 'Фотографии',
@@ -487,262 +569,267 @@ class _GenresPageState extends State<GenresPage> {
                         // Вкладка с фотографами
                         isLoadingPhotographers
                             ? const Center(
-                                child: CircularProgressIndicator(
-                                  color: Color(0xFFFFD700),
-                                ),
-                              )
+                              child: CircularProgressIndicator(
+                                color: Color(0xFFFFD700),
+                              ),
+                            )
                             : filteredPhotographers.isEmpty
-                                ? const Center(
-                                    child: Text(
-                                      'Фотографы не найдены',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.black,
-                                      ),
+                            ? const Center(
+                              child: Text(
+                                'Фотографы не найдены',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            )
+                            : ListView.builder(
+                              padding: const EdgeInsets.all(16),
+                              itemCount: filteredPhotographers.length,
+                              itemBuilder: (context, index) {
+                                final photographer =
+                                    filteredPhotographers[index];
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/photographer_profile',
+                                      arguments: photographer.id,
+                                    );
+                                  },
+                                  child: Card(
+                                    margin: const EdgeInsets.only(bottom: 16),
+                                    elevation: 2,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                  )
-                                : ListView.builder(
-                                    padding: const EdgeInsets.all(16),
-                                    itemCount: filteredPhotographers.length,
-                                    itemBuilder: (context, index) {
-                                      final photographer = filteredPhotographers[index];
-                                      return InkWell(
-                                        onTap: () {
-                                          Navigator.pushNamed(
-                                            context, 
-                                            '/photographer_profile',
-                                            arguments: photographer.id,
-                                          );
-                                        },
-                                        child: Card(
-                                          margin: const EdgeInsets.only(bottom: 16),
-                                          elevation: 2,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(12.0),
-                                            child: Row(
-                                              children: [
-                                                // Фото фотографа
-                                                ClipRRect(
-                                                  borderRadius: BorderRadius.circular(8),
-                                                  child: Image.network(
-                                                    photographer.avatarUrl ?? 'https://via.placeholder.com/80',
-                                                    width: 80,
-                                                    height: 80,
-                                                    fit: BoxFit.cover,
-                                                    errorBuilder: (context, error, stackTrace) {
-                                                      return Container(
-                                                        width: 80,
-                                                        height: 80,
-                                                        color: Colors.grey[300],
-                                                        child: const Icon(
-                                                          Icons.person,
-                                                          color: Color(0xFFFFD700),
-                                                          size: 40,
-                                                        ),
-                                                      );
-                                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Row(
+                                        children: [
+                                          // Фото фотографа
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            child: Image.network(
+                                              photographer.avatarUrl ??
+                                                  'https://via.placeholder.com/80',
+                                              width: 80,
+                                              height: 80,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (
+                                                context,
+                                                error,
+                                                stackTrace,
+                                              ) {
+                                                return Container(
+                                                  width: 80,
+                                                  height: 80,
+                                                  color: Colors.grey[300],
+                                                  child: const Icon(
+                                                    Icons.person,
+                                                    color: Color(0xFFFFD700),
+                                                    size: 40,
                                                   ),
-                                                ),
-                                                const SizedBox(width: 16),
-                                                // Информация о фотографе
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        '${photographer.name ?? ''} ${photographer.surname ?? ''}',
-                                                        style: const TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight: FontWeight.bold,
-                                                          color: Colors.black,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(height: 4),
-                                                      Row(
-                                                        children: [
-                                                          const Icon(
-                                                            Icons.location_on,
-                                                            color: Color(0xFFFFD700),
-                                                            size: 14,
-                                                          ),
-                                                          const SizedBox(width: 4),
-                                                          Text(
-                                                            photographer.cityTitle ?? 'Неизвестно',
-                                                            style: TextStyle(
-                                                              color: Colors.grey[700],
-                                                              fontSize: 14,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      const SizedBox(height: 4),
-                                                      if (photographer.price != null) ...[
-                                                        Row(
-                                                          children: [
-                                                            const Icon(
-                                                              Icons.monetization_on,
-                                                              color: Color(0xFFFFD700),
-                                                              size: 14,
-                                                            ),
-                                                            const SizedBox(width: 4),
-                                                            Text(
-                                                              '${photographer.price} ₽',
-                                                              style: TextStyle(
-                                                                color: Colors.grey[700],
-                                                                fontSize: 14,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ],
-                                                  ),
-                                                ),
-                                                // Стрелка вправо
-                                                const Icon(
-                                                  Icons.arrow_forward_ios,
-                                                  color: Color(0xFFFFD700),
-                                                  size: 16,
-                                                ),
-                                              ],
+                                                );
+                                              },
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                        
-                        // Вкладка с фотографиями
-                        isLoadingPortfolio
-                            ? const Center(
-                                child: CircularProgressIndicator(
-                                  color: Color(0xFFFFD700),
-                                ),
-                              )
-                            : filteredPortfolioItems.isEmpty
-                                ? const Center(
-                                    child: Text(
-                                      'Фотографии не найдены',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  )
-                                : GridView.builder(
-                                    padding: const EdgeInsets.all(16),
-                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      childAspectRatio: 0.75,
-                                      crossAxisSpacing: 16,
-                                      mainAxisSpacing: 16,
-                                    ),
-                                    itemCount: filteredPortfolioItems.length,
-                                    itemBuilder: (context, index) {
-                                      final item = filteredPortfolioItems[index];
-                                      return InkWell(
-                                        onTap: () => _showPortfolioItemDetails(item),
-                                        child: Card(
-                                          elevation: 2,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              // Квадратное фото
-                                              SizedBox(
-                                                height: 200,
-                                                width: double.infinity,
-                                                child: ClipRRect(
-                                                  borderRadius: BorderRadius.vertical(
-                                                    top: Radius.circular(12),
-                                                  ),
-                                                  child: Image.network(
-                                                    item.imageUrl,
-                                                    fit: BoxFit.cover,
-                                                    loadingBuilder: (context, child, loadingProgress) {
-                                                      if (loadingProgress == null) return child;
-                                                      return const Center(
-                                                        child: CircularProgressIndicator(
-                                                          color: Color(0xFFFFD700),
-                                                        ),
-                                                      );
-                                                    },
-                                                    errorBuilder: (context, error, stackTrace) {
-                                                      return Container(
-                                                        color: Colors.grey[300],
-                                                        child: const Icon(
-                                                          Icons.error_outline,
-                                                          color: Color(0xFFFFD700),
-                                                          size: 40,
-                                                        ),
-                                                      );
-                                                    },
+                                          const SizedBox(width: 16),
+                                          // Информация о фотографе
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '${photographer.name ?? ''} ${photographer.surname ?? ''}',
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
                                                   ),
                                                 ),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.all(8.0),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                const SizedBox(height: 4),
+                                                Row(
                                                   children: [
-                                                    Text(
-                                                      item.title,
-                                                      style: const TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        color: Colors.black,
-                                                      ),
-                                                      maxLines: 1,
-                                                      overflow: TextOverflow.ellipsis,
+                                                    const Icon(
+                                                      Icons.location_on,
+                                                      color: Color(0xFFFFD700),
+                                                      size: 14,
                                                     ),
-                                                    const SizedBox(height: 4),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          '${item.photographerSurname ?? ''} ${item.photographerName ?? ''}',
-                                                          style: const TextStyle(
-                                                            fontSize: 12,
-                                                            color: Colors.black54,
-                                                          ),
-                                                        ),
-                                                        ElevatedButton(
-                                                          onPressed: () {
-                                                            Navigator.pushNamed(
-                                                              context,
-                                                              '/photographer_profile',
-                                                              arguments: item.photographerId,
-                                                            );
-                                                          },
-                                                          style: ElevatedButton.styleFrom(
-                                                            backgroundColor: const Color(0xFFFFD700),
-                                                            foregroundColor: Colors.black,
-                                                            padding: const EdgeInsets.symmetric(
-                                                              horizontal: 8,
-                                                              vertical: 2,
-                                                            ),
-                                                            shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.circular(8),
-                                                            ),
-                                                            textStyle: const TextStyle(fontSize: 10),
-                                                          ),
-                                                          child: const Text('Профиль'),
-                                                        ),
-                                                      ],
+                                                    const SizedBox(width: 4),
+                                                    Text(
+                                                      photographer.cityTitle ??
+                                                          'Неизвестно',
+                                                      style: TextStyle(
+                                                        color: Colors.grey[700],
+                                                        fontSize: 14,
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
+                                                const SizedBox(height: 4),
+                                                if (photographer.price !=
+                                                    null) ...[
+                                                  Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.monetization_on,
+                                                        color: Color(
+                                                          0xFFFFD700,
+                                                        ),
+                                                        size: 14,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        '${photographer.price} ₽',
+                                                        style: TextStyle(
+                                                          color:
+                                                              Colors.grey[700],
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
+                                          ),
+                                          // Стрелка вправо
+                                          const Icon(
+                                            Icons.arrow_forward_ios,
+                                            color: Color(0xFFFFD700),
+                                            size: 16,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+
+                        // Вкладка с фотографиями
+                        isLoadingPortfolio
+                            ? const Center(
+                              child: CircularProgressIndicator(
+                                color: Color(0xFFFFD700),
+                              ),
+                            )
+                            : filteredPortfolioItems.isEmpty
+                            ? const Center(
+                              child: Text(
+                                'Фотографии не найдены',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            )
+                            : GridView.builder(
+                              padding: const EdgeInsets.all(16),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    childAspectRatio: 0.75,
+                                    crossAxisSpacing: 16,
+                                    mainAxisSpacing: 16,
+                                  ),
+                              itemCount: filteredPortfolioItems.length,
+                              itemBuilder: (context, index) {
+                                final item = filteredPortfolioItems[index];
+                                return InkWell(
+                                  onTap: () => _showPortfolioItemDetails(item),
+                                  child: Card(
+                                    elevation: 2,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Квадратное фото
+                                        SizedBox(
+                                          height: 200,
+                                          width: double.infinity,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(12),
+                                            ),
+                                            child: Image.network(
+                                              item.imageUrl,
+                                              fit: BoxFit.cover,
+                                              loadingBuilder: (
+                                                context,
+                                                child,
+                                                loadingProgress,
+                                              ) {
+                                                if (loadingProgress == null)
+                                                  return child;
+                                                return const Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                        color: Color(
+                                                          0xFFFFD700,
+                                                        ),
+                                                      ),
+                                                );
+                                              },
+                                              errorBuilder: (
+                                                context,
+                                                error,
+                                                stackTrace,
+                                              ) {
+                                                return Container(
+                                                  color: Colors.grey[300],
+                                                  child: const Icon(
+                                                    Icons.error_outline,
+                                                    color: Color(0xFFFFD700),
+                                                    size: 40,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                item.title,
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                '${item.photographerSurname ?? ''} ${item.photographerName ?? ''}',
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.black54,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ],
                                           ),
                                         ),
-                                      );
-                                    },
+                                      ],
+                                    ),
                                   ),
+                                );
+                              },
+                            ),
                       ],
                     ),
                   ),

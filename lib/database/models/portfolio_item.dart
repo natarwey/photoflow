@@ -10,8 +10,8 @@ class PortfolioItem {
   String? genreTitle;
   String? moodTitle;
   String? locationTitle;
-  final String? photographerSurname;
-  final String? photographerName;
+  String? photographerSurname;
+  String? photographerName;
   
   PortfolioItem({
     required this.id,
@@ -30,20 +30,23 @@ class PortfolioItem {
   });
   
   factory PortfolioItem.fromJson(Map<String, dynamic> json) {
-    final photographer = json['photographers'] as Map<String, dynamic>? ?? {};
+    var photographerData = json['photographers'] as Map<String, dynamic>? ?? {};
+    var userData = photographerData['user_id'] as Map<String, dynamic>? ?? {};
 
     return PortfolioItem(
       id: json['id'],
+      createdAt: DateTime.parse(json['created_at']),
+      photographerId: json['photographer_id'],
       imageUrl: json['image_url'],
       title: json['title'],
-      photographerId: json['photographer_id'],
-
-      photographerName: photographer['name'],
-      photographerSurname: photographer['surname'],
-
+      genreId: json['genre_id'],
+      moodId: json['mood_id'],
+      locationId: json['location_id'],
       genreTitle: json['genres']?['title'],
       moodTitle: json['moods']?['title'],
       locationTitle: json['locations']?['title'],
+      photographerName: userData['name'],
+      photographerSurname: userData['surname'],
     );
   }
 }
