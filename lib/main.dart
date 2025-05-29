@@ -29,6 +29,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'PhotoFlow',
       theme: ThemeData(
         primaryColor: const Color(0xFFFFD700), // Золотой цвет #FFD700
