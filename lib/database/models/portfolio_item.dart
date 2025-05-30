@@ -43,8 +43,8 @@ class PortfolioItem {
       moodId: json['mood_id'],
       locationId: json['location_id'],
       genreTitle: json['genres']?['title'],
-      moodTitle: json['moods']?['title'],
-      locationTitle: json['locations']?['title'],
+      moodTitle: json['mood']?['title'],
+      locationTitle: json['location']?['title'],
       photographerName: userData['name'],
       photographerSurname: userData['surname'],
     );

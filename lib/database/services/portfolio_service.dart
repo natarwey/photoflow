@@ -13,8 +13,8 @@ class PortfolioService {
           *,
           photographers(user_id(name, surname)),
           genres!inner(title),
-          moods!inner(title),
-          locations!inner(title)
+          mood!inner(title),
+          location!inner(title)
         ''')
         .order('id')
         .limit(50);

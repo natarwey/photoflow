@@ -398,13 +398,42 @@ class _GenresPageState extends State<GenresPage> {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          '${item.photographerSurname ?? ''} ${item.photographerName ?? ''}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.black54,
+                        if (item.photographerSurname != null ||
+                            item.photographerName != null)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${item.photographerSurname ?? ''} ${item.photographerName ?? ''}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/photographer_profile',
+                                    arguments: item.photographerId,
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFFFD700),
+                                  foregroundColor: Colors.black,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  textStyle: const TextStyle(fontSize: 10),
+                                ),
+                                child: const Text('Профиль'),
+                              ),
+                            ],
                           ),
-                        ),
                         const SizedBox(height: 8),
                         if (item.genreTitle != null) ...[
                           Row(
