@@ -106,9 +106,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
       }
     } catch (e) {
       print('Ошибка при загрузке данных пользователя: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Не удалось загрузить профиль: $e')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Не удалось загрузить профиль: $e')),
+      // );
     } finally {
       setState(() {
         isLoading = false;
@@ -236,32 +236,32 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             ],
                           )
                         else
-                          const Text('Вы не являетесь фотографом'),
+                          const Text(' '),
 
                         const SizedBox(height: 30),
 
                         // Кнопка редактирования профиля
-                        OutlinedButton.icon(
-                          onPressed: () {
-                            // Навигация на страницу редактирования профиля
-                          },
-                          icon: const Icon(Icons.edit),
-                          label: const Text('Редактировать профиль'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.black,
-                            side: const BorderSide(
-                              color: Color(0xFFFFD700),
-                              width: 2,
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                        ),
+                        // OutlinedButton.icon(
+                        //   onPressed: () {
+                        //     // Навигация на страницу редактирования профиля
+                        //   },
+                        //   icon: const Icon(Icons.edit),
+                        //   label: const Text('Редактировать профиль'),
+                        //   style: OutlinedButton.styleFrom(
+                        //     foregroundColor: Colors.black,
+                        //     side: const BorderSide(
+                        //       color: Color(0xFFFFD700),
+                        //       width: 2,
+                        //     ),
+                        //     padding: const EdgeInsets.symmetric(
+                        //       horizontal: 20,
+                        //       vertical: 12,
+                        //     ),
+                        //     shape: RoundedRectangleBorder(
+                        //       borderRadius: BorderRadius.circular(20),
+                        //     ),
+                        //   ),
+                        //),
                       ],
                     ),
                   ),

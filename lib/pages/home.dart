@@ -254,7 +254,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFD700),
         title: const Text(
-          'Home',
+          'Главная',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         iconTheme: const IconThemeData(color: Colors.black),

@@ -226,18 +226,18 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   }
                 },
               ),
-            ListTile(
-              leading: const Icon(Icons.accessibility, color: Color(0xFFFFD700)),
-              title: const Text(
-                'Позы',
-                style: TextStyle(color: Colors.black),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                // Навигация на страницу поз
-                Navigator.pushNamed(context, '/poses');
-              },
-            ),
+            // ListTile(
+            //   leading: const Icon(Icons.accessibility, color: Color(0xFFFFD700)),
+            //   title: const Text(
+            //     'Позы',
+            //     style: TextStyle(color: Colors.black),
+            //   ),
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //     // Навигация на страницу поз
+            //     Navigator.pushNamed(context, '/poses');
+            //   },
+            // ),
             ListTile(
               leading: const Icon(Icons.person, color: Color(0xFFFFD700)),
               title: const Text(
