@@ -12,15 +12,16 @@ class PhotographerService {
   // Получение всех фотографов
   Future<List<Photographer>> getAllPhotographers() async {
     try {
-      final photographersData = await supabase
-          .from('photographers')
-          .select();
-      
-      List<Photographer> photographers = photographersData.map<Photographer>((item) => Photographer.fromJson(item)).toList();
-      
+      final photographersData = await supabase.from('photographers').select();
+
+      List<Photographer> photographers =
+          photographersData
+              .map<Photographer>((item) => Photographer.fromJson(item))
+              .toList();
+
       // Загружаем дополнительную информацию для каждого фотографа
-      await _loadAdditionalInfo(photographers);
-      
+      await loadAdditionalInfo(photographers);
+
       return photographers;
     } catch (e) {
       if (kDebugMode) {
@@ -29,7 +30,7 @@ class PhotographerService {
       return [];
     }
   }
-  
+
   // Получение фотографов по жанру
   Future<List<Photographer>> getPhotographersByGenre(int genreId) async {
     try {
@@ -38,25 +39,31 @@ class PhotographerService {
           .from('photographer_genres')
           .select('photographer_id')
           .eq('genre_id', genreId);
-      
+
       if (photographerGenres.isEmpty) {
         return [];
       }
-      
+
       // Извлекаем ID фотографов
-      List<int> photographerIds = photographerGenres.map<int>((item) => item['photographer_id'] as int).toList();
-      
+      List<int> photographerIds =
+          photographerGenres
+              .map<int>((item) => item['photographer_id'] as int)
+              .toList();
+
       // Получаем данные фотографов
       final photographersData = await supabase
           .from('photographers')
           .select()
           .inFilter('id', photographerIds);
-      
-      List<Photographer> photographers = photographersData.map<Photographer>((item) => Photographer.fromJson(item)).toList();
-      
+
+      List<Photographer> photographers =
+          photographersData
+              .map<Photographer>((item) => Photographer.fromJson(item))
+              .toList();
+
       // Загружаем дополнительную информацию для каждого фотографа
-      await _loadAdditionalInfo(photographers);
-      
+      await loadAdditionalInfo(photographers);
+
       return photographers;
     } catch (e) {
       if (kDebugMode) {
@@ -65,21 +72,22 @@ class PhotographerService {
       return [];
     }
   }
-  
+
   // Получение фотографа по ID
   Future<Photographer?> getPhotographerById(int photographerId) async {
     try {
-      final response = await supabase
-          .from('photographers')
-          .select()
-          .eq('id', photographerId)
-          .single();
-      
+      final response =
+          await supabase
+              .from('photographers')
+              .select()
+              .eq('id', photographerId)
+              .single();
+
       Photographer photographer = Photographer.fromJson(response);
-      
+
       // Загружаем дополнительную информацию
-      await _loadAdditionalInfo([photographer]);
-      
+      await loadAdditionalInfo([photographer]);
+
       return photographer;
     } catch (e) {
       if (kDebugMode) {
@@ -88,25 +96,30 @@ class PhotographerService {
       return null;
     }
   }
-  
+
   // Получение фотографа по ID пользователя
   Future<Photographer?> getPhotographerByUserId(String userId) async {
     try {
-      final response = await supabase
-          .from('photographers')
-          .select()
-          .eq('user_id', userId)
-          .maybeSingle();
-      
+      if (userId.isEmpty) {
+      throw Exception("ID пользователя не указан");
+    }
+    
+      final response =
+          await supabase
+              .from('photographers')
+              .select()
+              .eq('user_id', userId)
+              .maybeSingle();
+
       if (response == null) {
         return null;
       }
-      
+
       Photographer photographer = Photographer.fromJson(response);
-      
+
       // Загружаем дополнительную информацию
-      await _loadAdditionalInfo([photographer]);
-      
+      await loadAdditionalInfo([photographer]);
+
       return photographer;
     } catch (e) {
       if (kDebugMode) {
@@ -115,53 +128,54 @@ class PhotographerService {
       return null;
     }
   }
-  
+
   // Загрузка дополнительной информации для фотографов
-  Future<void> _loadAdditionalInfo(List<Photographer> photographers) async {
+  Future<void> loadAdditionalInfo(List<Photographer> photographers) async {
     if (photographers.isEmpty) return;
-    
+
     try {
-      // Получаем уникальные ID пользователей и городов
       Set<String> userIds = photographers.map((p) => p.userId).toSet();
       Set<int> cityIds = photographers.map((p) => p.cityId).toSet();
-      
-      // Загружаем данные пользователей
-      final usersData = await supabase
-          .from('users')
-          .select()
-          .inFilter('id', userIds.toList());
-      
-      Map<String, app_user.User> userMap = {};
-      for (var userData in usersData) {
-        userMap[userData['id']] = app_user.User.fromJson(userData);
-      }
-      
-      // Загружаем данные городов
-      final citiesData = await supabase
-          .from('city')
-          .select()
-          .inFilter('id', cityIds.toList());
-      
-      Map<int, String> cityMap = {};
-      for (var cityData in citiesData) {
-        cityMap[cityData['id']] = cityData['title'];
-      }
-      
-      // Присваиваем данные пользователей и городов фотографам
-      for (var photographer in photographers) {
-        if (userMap.containsKey(photographer.userId)) {
-          photographer.name = userMap[photographer.userId]!.name;
-          photographer.surname = userMap[photographer.userId]!.surname;
-          photographer.avatarUrl = userMap[photographer.userId]!.avatarUrl;
+
+      // Получаем данные пользователей
+      if (userIds.isNotEmpty) {
+        final usersResponse = await supabase
+            .from('users')
+            .select()
+            .inFilter('id', userIds.toList());
+
+        Map<String, app_user.User> userMap = {};
+        for (var userData in usersResponse) {
+          userMap[userData['id']] = app_user.User.fromJson(userData);
         }
-        
-        if (cityMap.containsKey(photographer.cityId)) {
+
+        for (var photographer in photographers) {
+          photographer.name = userMap[photographer.userId]?.name;
+          photographer.surname = userMap[photographer.userId]?.surname;
+        }
+      }
+
+      // Получаем города
+      if (cityIds.isNotEmpty) {
+        final citiesResponse = await supabase
+            .from('city')
+            .select()
+            .inFilter('id', cityIds.toList());
+
+        Map<int, String> cityMap = {};
+        for (var city in citiesResponse) {
+          cityMap[city['id']] = city['title'];
+        }
+
+        for (var photographer in photographers) {
           photographer.cityTitle = cityMap[photographer.cityId];
         }
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Ошибка при загрузке дополнительной информации для фотографов: $e');
+        print(
+          'Ошибка при загрузке дополнительной информации для фотографов: $e',
+        );
       }
     }
   }

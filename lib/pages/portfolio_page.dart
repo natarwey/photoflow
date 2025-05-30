@@ -24,7 +24,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final photographerId = ModalRoute.of(context)!.settings.arguments as int;
+    final photographerId = ModalRoute.of(context)!.settings.arguments as String;
     _loadData(photographerId);
   }
 

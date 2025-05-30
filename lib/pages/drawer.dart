@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:photoflow/database/models/photographer.dart';
+import 'package:photoflow/database/models/user.dart' as app_user;
 import 'package:photoflow/database/services/auth_service.dart';
 import 'package:photoflow/database/services/user_service.dart';
 import 'package:photoflow/main.dart';
@@ -21,6 +23,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   bool isPhotographer = false;
   bool isLoading = true;
   
+  String fixedUserId = 'fe1511f5-4cea-42d9-9d51-289e0d5d54b4';
+  app_user.User? user;
+  Photographer? photographer;
+  
   @override
   void initState() {
     super.initState();
@@ -33,50 +39,84 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       isLoading = true;
     });
     
-    try {
+    //try {
       // Получаем текущего пользователя из Supabase Auth
-      final currentUser = supabase.auth.currentUser;
+      // final currentUser = supabase.auth.currentUser;
       
-      if (currentUser != null) {
-        // Получаем данные пользователя из таблицы users
-        final userData = await supabase
-            .from('users')
-            .select()
-            .eq('id', currentUser.id)
-            .single();
+      // if (currentUser != null) {
+      //   // Получаем данные пользователя из таблицы users
+      //   final userData = await supabase
+      //       .from('users')
+      //       .select()
+      //       .eq('id', currentUser.id)
+      //       .single();
         
-        if (userData != null) {
-          setState(() {
-            userName = '${userData['name']} ${userData['surname'] ?? ''}';
-            userEmail = userData['email'];
-            avatarUrl = userData['avatar_url'];
-          });
-        }
+      //   if (userData != null) {
+      //     setState(() {
+      //       userName = '${userData['name']} ${userData['surname'] ?? ''}';
+      //       userEmail = userData['email'];
+      //       avatarUrl = userData['avatar_url'];
+      //     });
+      //   }
         
-        // Проверяем, является ли пользователь фотографом
-        final photographerData = await supabase
-            .from('photographers')
-            .select()
-            .eq('user_id', currentUser.id)
-            .maybeSingle();
+      //   // Проверяем, является ли пользователь фотографом
+      //   final photographerData = await supabase
+      //       .from('photographers')
+      //       .select()
+      //       .eq('user_id', currentUser.id)
+      //       .maybeSingle();
         
+      //   setState(() {
+      //     isPhotographer = photographerData != null;
+      //     isLoading = false;
+      //   });
+        
+      //   // Сохраняем статус фотографа в SharedPreferences
+      //   final prefs = await SharedPreferences.getInstance();
+      //   await prefs.setBool('isPhotographer', isPhotographer);
+      // } else {
+      //   setState(() {
+      //     isLoading = false;
+      //   });
+      // }
+
+    try {
+      // Получаем данные пользователя по фиксированному ID
+      final userData = await supabase
+          .from('users')
+          .select()
+          .eq('id', fixedUserId)
+          .single();
+
+      if (userData == null || userData.isEmpty) {
+        throw Exception("Данные пользователя пустые");
+      }
+
+      setState(() {
+        user = app_user.User.fromJson(userData);
+        userName = '${user!.name} ${user!.surname ?? ''}';
+        userEmail = user!.email;
+        avatarUrl = user!.avatarUrl;
+      });
+
+      // Проверяем, является ли пользователь фотографом
+      final photographerData = await supabase
+          .from('photographers')
+          .select()
+          .eq('user_id', fixedUserId)
+          .maybeSingle();
+
+      if (photographerData != null) {
         setState(() {
-          isPhotographer = photographerData != null;
-          isLoading = false;
-        });
-        
-        // Сохраняем статус фотографа в SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('isPhotographer', isPhotographer);
-      } else {
-        setState(() {
-          isLoading = false;
+          photographer = Photographer.fromJson(photographerData);
+          isPhotographer = true;
         });
       }
     } catch (e) {
       if (kDebugMode) {
         print('Ошибка при загрузке данных пользователя: $e');
       }
+    } finally {
       setState(() {
         isLoading = false;
       });
@@ -167,14 +207,16 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       final photographerData = await supabase
                           .from('photographers')
                           .select()
-                          .eq('user_id', user.id)
+                          .eq('user_id', fixedUserId)
                           .single();
+
+                      final photographerId = photographerData['id'] as String;
                       
                       // Переходим на страницу портфолио
                       Navigator.pushNamed(
                         context,
                         '/portfolio',
-                        arguments: photographerData['id'],
+                        arguments: photographerId,
                       );
                     }
                   } catch (e) {

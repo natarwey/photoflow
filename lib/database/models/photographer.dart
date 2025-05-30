@@ -1,5 +1,5 @@
 class Photographer {
-  final int id;
+  final String id;
   final DateTime createdAt;
   final String userId;
   final String? bio;
