@@ -13,7 +13,7 @@ class AuthService {
         .select()
         .eq('email', email)
         .eq('password', password)
-        .single();
+        .maybeSingle();
 
     if (userData == null) {
       return null; // Неверные учетные данные
@@ -59,44 +59,59 @@ class AuthService {
   // Регистрация пользователя
   Future<Map<String, dynamic>?> signUp(String email, String password, String name, {String? surname}) async {
   try {
-    // Проверяем, существует ли уже пользователь с таким email
-    final existingUser = await supabase
-        .from('users')
-        .select()
-        .eq('email', email)
-        .single();
+    // Регистрация пользователя в системе аутентификации SupabaseAdd commentMore actions
+      final authResponse = await supabase.auth.signUp(
+        email: email,
+        password: password,
+      );
 
-    if (existingUser != null) {
-      return {'success': false, 'error': 'Пользователь с таким email уже существует'};
+    if (authResponse.user == null) {
+      return {'success': false, 'error': 'Ошибка аутентификации'};
     }
 
-    // Создаем нового пользователя
-    final newUser = await supabase.from('users').insert({
+    // 2. Добавляем пользователя в таблицу users
+    final userData = {
+      'id': authResponse.user!.id,
       'email': email,
-      'password': password,
       'name': name,
       'surname': surname,
+      'password': password, // Обратите внимание: хранение пароля в открытом виде небезопасно
       'created_at': DateTime.now().toIso8601String(),
-    }).select().single();
+    };
 
-    if (newUser != null) {
-      // Сохраняем данные нового пользователя в SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('userId', newUser['id']);
-      await prefs.setBool('isLoggedIn', true);
+    final insertResponse = await supabase
+        .from('users')
+        .insert(userData)
+        .select()
+        .single();
 
-      return {
-        'success': true,
-        'user': newUser,
-      };
+    if (kDebugMode) {
+      print('Пользователь успешно добавлен в таблицу users');
     }
 
-    return null;
-  } catch (e) {
+    // 3. Сохраняем данные в SharedPreferences (важная часть, которую вы просили не убирать)
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userId', authResponse.user!.id);
+    await prefs.setBool('isLoggedIn', true);
+
+    return {
+      'success': true,
+      'user': insertResponse, // Возвращаем данные из таблицы users
+    };
+    } catch (e) {
     if (kDebugMode) {
       print('Ошибка регистрации: $e');
     }
-    return null;
+    
+    // При ошибке пытаемся выйти из системы
+    try {
+      await supabase.auth.signOut();
+    } catch (_) {}
+    
+    return {
+      'success': false,
+      'error': e.toString(),
+    };
   }
 }
   
