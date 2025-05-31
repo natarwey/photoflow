@@ -7,6 +7,7 @@ import 'package:photoflow/database/services/user_service.dart';
 import 'package:photoflow/main.dart';
 import 'package:photoflow/pages/drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -142,131 +143,245 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ),
               )
               : SingleChildScrollView(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Аватар пользователя
-                        CircleAvatar(
-                          radius: 60,
-                          backgroundColor: Colors.white,
-                          backgroundImage:
-                              user!.avatarUrl != null
-                                  ? NetworkImage(user!.avatarUrl!)
-                                  : null,
-                          child:
-                              user!.avatarUrl == null
-                                  ? const Icon(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Аватар пользователя
+                          CircleAvatar(
+                            radius: 60,
+                            backgroundColor: Colors.white,
+                            backgroundImage: user!.avatarUrl != null
+                                ? NetworkImage(user!.avatarUrl!)
+                                : null,
+                            child: user!.avatarUrl == null
+                                ? const Icon(
                                     Icons.person,
                                     size: 60,
                                     color: Color(0xFFFFD700),
                                   )
-                                  : null,
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Имя и фамилия пользователя
-                        Text(
-                          '${user!.name} ${user!.surname ?? ''}',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                                : null,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 10),
+                          const SizedBox(height: 20),
 
-                        // Email пользователя
-                        Text(
-                          user!.email,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[700],
+                          // Имя и фамилия пользователя
+                          Text(
+                            '${user!.name} ${user!.surname ?? ''}',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                        ),
-                        const SizedBox(height: 30),
+                          const SizedBox(height: 20),
 
-                        // Дополнительная информация для фотографов
-                        if (photographer != null)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          // Email пользователя
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                'Город: ${photographer?.cityTitle ?? 'Не указан'}',
+                              const Icon(
+                                Icons.email,
+                                color: Color(0xFFFFD700),
                               ),
+                              const SizedBox(width: 5),
                               Text(
-                                'Опыт: ${photographer?.experience ?? 0} лет',
-                              ),
-                              Text('Цена: ${photographer?.price ?? 0} ₽'),
-                              if (photographer?.bio != null &&
-                                  photographer!.bio!.isNotEmpty)
-                                Text('Биография: ${photographer!.bio!}'),
-                              if (photographer?.socialLinks != null &&
-                                  photographer!.socialLinks!.isNotEmpty)
-                                Text('Ссылки: ${photographer!.socialLinks!}'),
-
-                              const SizedBox(height: 20),
-
-                              // Кнопка "Портфолио"
-                              ElevatedButton.icon(
-                                onPressed: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/portfolio',
-                                    arguments: photographer!.id,
-                                  );
-                                },
-                                icon: const Icon(Icons.photo_library),
-                                label: const Text('Мое портфолио'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFFFD700),
-                                  foregroundColor: Colors.black,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 12,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
+                                user!.email,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black87,
                                 ),
                               ),
                             ],
-                          )
-                        else
-                          const Text(' '),
+                          ),
+                          const SizedBox(height: 20),
 
-                        const SizedBox(height: 30),
+                          // Дополнительная информация для фотографов
+                          if (photographer != null) ...[
+                            // Биография
+                            if (photographer!.bio != null &&
+                                photographer!.bio!.isNotEmpty) ...[
+                              const Text(
+                                'О фотографе',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                photographer!.bio!,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black87,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 20),
+                            ],
 
-                        // Кнопка редактирования профиля
-                        // OutlinedButton.icon(
-                        //   onPressed: () {
-                        //     // Навигация на страницу редактирования профиля
-                        //   },
-                        //   icon: const Icon(Icons.edit),
-                        //   label: const Text('Редактировать профиль'),
-                        //   style: OutlinedButton.styleFrom(
-                        //     foregroundColor: Colors.black,
-                        //     side: const BorderSide(
-                        //       color: Color(0xFFFFD700),
-                        //       width: 2,
-                        //     ),
-                        //     padding: const EdgeInsets.symmetric(
-                        //       horizontal: 20,
-                        //       vertical: 12,
-                        //     ),
-                        //     shape: RoundedRectangleBorder(
-                        //       borderRadius: BorderRadius.circular(20),
-                        //     ),
-                        //   ),
-                        //),
-                      ],
+                            // Город
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.location_on,
+                                  color: Color(0xFFFFD700),
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  'Город: ${photographer!.cityTitle}' ?? 'Город не указан',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+
+                            // Опыт
+                            if (photographer!.experience != null) ...[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.work,
+                                    color: Color(0xFFFFD700),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'Опыт: ${photographer!.experience} ${_getYearsText(photographer!.experience!)}',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+
+                            // Цена
+                            if (photographer!.price != null) ...[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.monetization_on,
+                                    color: Color(0xFFFFD700),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'Цена: ${photographer!.price} ₽',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+
+                            // Социальные сети
+                            if (photographer!.socialLinks != null &&
+                                photographer!.socialLinks!.isNotEmpty) ...[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.link,
+                                    color: Color(0xFFFFD700),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Flexible(
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        final link = photographer!.socialLinks!;
+                                        if (await canLaunchUrl(Uri.parse(link))) {
+                                          await launchUrl(Uri.parse(link));
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  'Не удалось открыть ссылку'),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: Text(
+                                        photographer!.socialLinks!,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black87,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                            ],
+
+                            // Кнопка "Портфолио"
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/portfolio',
+                                  arguments: photographer!.id,
+                                );
+                              },
+                              icon: const Icon(Icons.photo_library),
+                              label: const Text('Мое портфолио'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFFD700),
+                                foregroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                            ),
+                          ] else
+                            const SizedBox(height: 20),
+
+                          // Кнопка редактирования профиля
+                          // OutlinedButton.icon(
+                          //   onPressed: () {
+                          //     // Навигация на страницу редактирования профиля
+                          //   },
+                          //   icon: const Icon(Icons.edit),
+                          //   label: const Text('Редактировать профиль'),
+                          //   style: OutlinedButton.styleFrom(
+                          //     foregroundColor: Colors.black,
+                          //     side: const BorderSide(
+                          //       color: Color(0xFFFFD700),
+                          //       width: 2,
+                          //     ),
+                          //     padding: const EdgeInsets.symmetric(
+                          //       horizontal: 20,
+                          //       vertical: 12,
+                          //     ),
+                          //     shape: RoundedRectangleBorder(
+                          //       borderRadius: BorderRadius.circular(20),
+                          //     ),
+                          //   ),
+                          // ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
     );
   }
 

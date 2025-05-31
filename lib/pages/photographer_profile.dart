@@ -54,7 +54,7 @@ class _PhotographerProfilePageState extends State<PhotographerProfilePage> {
     return Scaffold(
       backgroundColor: const Color(0xFFEEEEEE),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFFD700),
+        backgroundColor: const Color(0xFFFFD700), 
         title: Text(
           photographer != null
               ? '${photographer!.name ?? ''} ${photographer!.surname ?? ''}'
@@ -149,7 +149,7 @@ class _PhotographerProfilePageState extends State<PhotographerProfilePage> {
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              photographer!.cityTitle ?? 'Неизвестно',
+                              photographer!.cityTitle ?? 'Город: Казань',
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black87,
@@ -269,36 +269,36 @@ class _PhotographerProfilePageState extends State<PhotographerProfilePage> {
                         const SizedBox(height: 20),
 
                         // Кнопка "Добавить в избранное"
-                        OutlinedButton.icon(
-                          onPressed: () {
+                        // OutlinedButton.icon(
+                        //   onPressed: () {
                             // Добавление в избранное
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Добавлено в избранное',
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                                backgroundColor: Color(0xFFFFD700),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.favorite_border),
-                          label: const Text('Добавить в избранное'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.black,
-                            side: const BorderSide(
-                              color: Color(0xFFFFD700),
-                              width: 2,
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                        ),
+                        //     ScaffoldMessenger.of(context).showSnackBar(
+                        //       const SnackBar(
+                        //         content: Text(
+                        //           'Добавлено в избранное',
+                        //           style: TextStyle(color: Colors.black),
+                        //         ),
+                        //         backgroundColor: Color(0xFFFFD700),
+                        //       ),
+                        //     );
+                        //   },
+                        //   icon: const Icon(Icons.favorite_border),
+                        //   label: const Text('Добавить в избранное'),
+                        //   style: OutlinedButton.styleFrom(
+                        //     foregroundColor: Colors.black,
+                        //     side: const BorderSide(
+                        //       color: Color(0xFFFFD700),
+                        //       width: 2,
+                        //     ),
+                        //     padding: const EdgeInsets.symmetric(
+                        //       horizontal: 20,
+                        //       vertical: 12,
+                        //     ),
+                        //     shape: RoundedRectangleBorder(
+                        //       borderRadius: BorderRadius.circular(20),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
