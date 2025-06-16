@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:photoflow/pages/auth.dart';
 import 'package:photoflow/pages/genres.dart';
 import 'package:photoflow/pages/home.dart';
+import 'package:photoflow/pages/locations.dart';
 import 'package:photoflow/pages/photographer_profile.dart';
 import 'package:photoflow/pages/portfolio_page.dart';
-import 'package:photoflow/pages/poses.dart';
 import 'package:photoflow/pages/recovery.dart';
 import 'package:photoflow/pages/reg.dart';
 import 'package:photoflow/pages/user_profile.dart';
@@ -74,7 +74,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomePage(),
         '/genres': (context) => const GenresPage(),
         '/photographer_profile': (context) => const PhotographerProfilePage(),
-        '/poses': (context) => const PosesPage(),
+        '/locations': (context) => const LocationsPage(),
         '/user_profile': (context) => const UserProfilePage(),
         '/portfolio': (context) => const PortfolioPage(),
       },

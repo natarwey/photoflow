@@ -34,6 +34,28 @@ class PortfolioService {
     }
   }
 
+  Future<List<PortfolioItem>> getRandomPortfolioItemsByLocation(int locationId, int limit) async {
+    try {
+      final response = await supabase
+          .from('portfolio_items')
+          .select('''*, photographers(user_id(name, surname))''')
+          .eq('location_id', locationId)
+          .order('created_at', ascending: false)
+          .limit(limit);
+
+      List<PortfolioItem> portfolioItems = response.map<PortfolioItem>((item) => PortfolioItem.fromJson(item)).toList();
+
+      await _loadAdditionalInfo(portfolioItems);
+
+      return portfolioItems;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Ошибка при получении портфолио по локации: $e');
+      }
+      return [];
+    }
+  }
+
   Future<List<PortfolioItem>> getPortfolioByPhotographerId(
     int photographerId,
   ) async {
