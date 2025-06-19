@@ -34,7 +34,7 @@ class PortfolioService {
     }
   }
 
-  Future<List<PortfolioItem>> getRandomPortfolioItemsByLocation(int locationId, int limit) async {
+  Future<List<PortfolioItem>> getRandomPortfolioItemsByLocation(String locationId, int limit) async {
     try {
       final response = await supabase
           .from('portfolio_items')

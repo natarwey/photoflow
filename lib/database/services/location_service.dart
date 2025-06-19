@@ -16,7 +16,7 @@ class LocationService {
     }
   }
   
-  Future<Location?> getLocationById(int id) async {
+  Future<Location?> getLocationById(String id) async {
     try {
       final response = await supabase
           .from('location')

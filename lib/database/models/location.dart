@@ -1,5 +1,5 @@
 class Location {
-  final int id;
+  final String id;
   final DateTime createdAt;
   final String title;
   
@@ -11,7 +11,7 @@ class Location {
   
   factory Location.fromJson(Map<String, dynamic> json) {
     return Location(
-      id: json['id'],
+      id: json['id'].toString(),
       createdAt: DateTime.parse(json['created_at']),
       title: json['title'],
     );

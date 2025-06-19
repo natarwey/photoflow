@@ -19,6 +19,7 @@ class _LocationsPageState extends State<LocationsPage> {
   Location? selectedLocation;
   List<PortfolioItem> photos = [];
   List<int> loadedPhotoIds = []; // Храним ID уже загруженных фото
+  int currentPhotoIndex = 0; // Текущий индекс отображаемого фото
   bool isLoading = true;
 
   @override
@@ -43,16 +44,23 @@ class _LocationsPageState extends State<LocationsPage> {
     }
   }
 
-  Future<void> _fetchRandomPhotos(int locationId, int limit) async {
+  Future<void> _fetchRandomPhotos(String locationId, int limit) async {
     try {
+      print('Запрос фото для локации $locationId с лимитом $limit');
       final fetchedPhotos = await _portfolioService.getRandomPortfolioItemsByLocation(locationId, limit);
+      print('Получено фото: ${fetchedPhotos.length}');
+      // Логируем ID полученных фото
+      print('ID полученных фото: ${fetchedPhotos.map((p) => p.id).toList()}');
 
       // Фильтруем, чтобы исключить повторные фото
       List<PortfolioItem> uniquePhotos = fetchedPhotos.where((photo) {
         return !loadedPhotoIds.contains(photo.id);
       }).toList();
 
+      print('После фильтрации уникальных фото: ${uniquePhotos.length}');
+
       if (uniquePhotos.isEmpty) {
+        print('Нет новых фото для локации $locationId');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Еще идей на этой локации пока нет'),
@@ -70,6 +78,7 @@ class _LocationsPageState extends State<LocationsPage> {
       });
     } catch (e) {
       if (mounted) {
+        print('Ошибка при загрузке фото: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Ошибка загрузки фото: $e')),
         );
@@ -83,14 +92,23 @@ class _LocationsPageState extends State<LocationsPage> {
         selectedLocation = location;
         photos.clear();
         loadedPhotoIds.clear();
-        _fetchRandomPhotos(location.id, 1); // Загружаем первое фото
+        currentPhotoIndex = 0; // Сбрасываем индекс
+        _fetchRandomPhotos(location.id, 3); // Загружаем 3 фото сразу
       });
     }
   }
 
   void _loadMorePhotos() {
-    if (selectedLocation != null && photos.length < 3) {
-      _fetchRandomPhotos(selectedLocation!.id, 1);
+    if (selectedLocation != null && currentPhotoIndex < photos.length - 1) {
+      setState(() {
+        currentPhotoIndex++; // Переходим к следующему фото
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('На этой локации больше нет идей'),
+        ),
+      );
     }
   }
 
@@ -106,51 +124,52 @@ class _LocationsPageState extends State<LocationsPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFEEEEEE),
-      appBar: AppBar(
-        title: const Text('Идеи поз'),
-        backgroundColor: const Color(0xFFFFD700),
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)))
-          : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: DropdownButton<Location>(
-                          isExpanded: true,
-                          value: selectedLocation,
-                          hint: const Text('Выберите локацию'),
-                          items: locations.map((location) {
-                            return DropdownMenuItem<Location>(
-                              value: location,
-                              child: Text(location.title),
-                            );
-                          }).toList(),
-                          onChanged: _handleLocationChange,
-                        ),
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: const Color(0xFFEEEEEE),
+    appBar: AppBar(
+      title: const Text('Идеи поз'),
+      backgroundColor: const Color(0xFFFFD700),
+      iconTheme: const IconThemeData(color: Colors.black),
+    ),
+    body: isLoading
+        ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)))
+        : Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButton<Location>(
+                        isExpanded: true,
+                        value: selectedLocation,
+                        hint: const Text('Выберите локацию'),
+                        items: locations.map((location) {
+                          return DropdownMenuItem<Location>(
+                            value: location,
+                            child: Text(location.title),
+                          );
+                        }).toList(),
+                        onChanged: _handleLocationChange,
                       ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: selectedLocation != null && photos.length < 3
-                            ? _loadMorePhotos
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFFD700),
-                          foregroundColor: Colors.black,
-                        ),
-                        child: const Text('Еще'),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: selectedLocation != null && currentPhotoIndex < photos.length - 1
+                          ? _loadMorePhotos
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFD700),
+                        foregroundColor: Colors.black,
                       ),
-                    ],
-                  ),
+                      child: const Text('Еще'),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 10),
+              ),
+              const SizedBox(height: 10),
+              if (photos.isNotEmpty)
                 Expanded(
                   child: GridView.builder(
                     shrinkWrap: true,
@@ -161,7 +180,7 @@ class _LocationsPageState extends State<LocationsPage> {
                       crossAxisSpacing: 10,
                       childAspectRatio: 1.0,
                     ),
-                    itemCount: photos.length,
+                    itemCount: currentPhotoIndex + 1,
                     itemBuilder: (context, index) {
                       final photo = photos[index];
                       return Card(
@@ -186,8 +205,20 @@ class _LocationsPageState extends State<LocationsPage> {
                     },
                   ),
                 ),
-              ],
-            ),
-    );
-  }
+              if (photos.isEmpty && !isLoading)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    '',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+  );
+}
 }
