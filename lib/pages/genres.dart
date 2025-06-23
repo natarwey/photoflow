@@ -5,6 +5,7 @@ import 'package:photoflow/database/models/genre.dart';
 import 'package:photoflow/database/models/photographer.dart';
 import 'package:photoflow/database/models/portfolio_item.dart';
 import 'package:photoflow/database/services/city_service.dart';
+import 'package:photoflow/database/services/favorite_service.dart';
 import 'package:photoflow/database/services/photographer_service.dart';
 import 'package:photoflow/database/services/portfolio_service.dart';
 import 'package:photoflow/main.dart';
@@ -757,7 +758,8 @@ class _GenresPageState extends State<GenresPage> {
                                 ),
                               ),
                             )
-                            : GridView.builder(
+                            : Expanded(
+                              child: GridView.builder(
                               padding: const EdgeInsets.all(16),
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
@@ -830,6 +832,35 @@ class _GenresPageState extends State<GenresPage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
+                                              Align(
+                                                  alignment: Alignment.topRight,
+                                                  child: IconButton(
+                                                    icon: Icon(
+                                                      item.isFavorited
+                                                          ? Icons.favorite
+                                                          : Icons
+                                                              .favorite_border,
+                                                      color: Colors.red,
+                                                    ),
+                                                    onPressed: () async {
+                                                      if (item.isFavorited) {
+                                                        await FavoriteService()
+                                                            .removeFromFavorites(
+                                                              item.id,
+                                                            );
+                                                      } else {
+                                                        await FavoriteService()
+                                                            .addToFavorites(
+                                                              item.id,
+                                                            );
+                                                      }
+                                                      setState(() {
+                                                        item.isFavorited =
+                                                            !item.isFavorited;
+                                                      });
+                                                    },
+                                                  ),
+                                                ),
                                               Text(
                                                 item.title,
                                                 style: const TextStyle(
@@ -858,6 +889,7 @@ class _GenresPageState extends State<GenresPage> {
                                   ),
                                 );
                               },
+                            ),
                             ),
                       ],
                     ),

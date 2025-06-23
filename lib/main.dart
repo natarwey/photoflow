@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photoflow/pages/auth.dart';
+import 'package:photoflow/pages/favorites.dart';
 import 'package:photoflow/pages/genres.dart';
 import 'package:photoflow/pages/home.dart';
 import 'package:photoflow/pages/locations.dart';
@@ -74,6 +75,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomePage(),
         '/genres': (context) => const GenresPage(),
         '/photographer_profile': (context) => const PhotographerProfilePage(),
+        '/favorites': (context) => const FavoritesPage(),        
         '/locations': (context) => const LocationsPage(),
         '/user_profile': (context) => const UserProfilePage(),
         '/portfolio': (context) => const PortfolioPage(),

@@ -232,10 +232,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.pushNamed(
-                  context,
-                  '/locations',
-                );
+                Navigator.pushNamed(context, '/locations');
               },
             ),
             ListTile(
@@ -247,6 +244,17 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/user_profile');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.favorite, color: Color(0xFFFFD700)),
+              title: const Text(
+                'Избранные фото',
+                style: TextStyle(color: Colors.black),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/favorites');
               },
             ),
             const Divider(color: Colors.black26),

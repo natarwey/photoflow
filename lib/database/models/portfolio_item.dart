@@ -12,6 +12,7 @@ class PortfolioItem {
   String? locationTitle;
   String? photographerSurname;
   String? photographerName;
+  bool isFavorited = false;
   
   PortfolioItem({
     required this.id,
