@@ -24,11 +24,11 @@ class _PortfolioPageState extends State<PortfolioPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final photographerId = ModalRoute.of(context)!.settings.arguments as String;
+    final photographerId = ModalRoute.of(context)!.settings.arguments as int;
     _loadData(photographerId);
   }
 
-  Future<void> _loadData(photographerId) async {
+  Future<void> _loadData(int photographerId) async {
     setState(() {
       isLoading = true;
     });

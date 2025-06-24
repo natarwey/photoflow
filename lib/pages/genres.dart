@@ -760,79 +760,81 @@ class _GenresPageState extends State<GenresPage> {
                             )
                             : Expanded(
                               child: GridView.builder(
-                              padding: const EdgeInsets.all(16),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    childAspectRatio: 0.75,
-                                    crossAxisSpacing: 16,
-                                    mainAxisSpacing: 16,
-                                  ),
-                              itemCount: filteredPortfolioItems.length,
-                              itemBuilder: (context, index) {
-                                final item = filteredPortfolioItems[index];
-                                return InkWell(
-                                  onTap: () => _showPortfolioItemDetails(item),
-                                  child: Card(
-                                    elevation: 2,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                padding: const EdgeInsets.all(16),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      childAspectRatio: 0.75,
+                                      crossAxisSpacing: 16,
+                                      mainAxisSpacing: 16,
                                     ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // Квадратное фото
-                                        SizedBox(
-                                          height: 200,
-                                          width: double.infinity,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.vertical(
-                                              top: Radius.circular(12),
-                                            ),
-                                            child: Image.network(
-                                              item.imageUrl,
-                                              fit: BoxFit.cover,
-                                              loadingBuilder: (
-                                                context,
-                                                child,
-                                                loadingProgress,
-                                              ) {
-                                                if (loadingProgress == null)
-                                                  return child;
-                                                return const Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                        color: Color(
-                                                          0xFFFFD700,
-                                                        ),
-                                                      ),
-                                                );
-                                              },
-                                              errorBuilder: (
-                                                context,
-                                                error,
-                                                stackTrace,
-                                              ) {
-                                                return Container(
-                                                  color: Colors.grey[300],
-                                                  child: const Icon(
-                                                    Icons.error_outline,
-                                                    color: Color(0xFFFFD700),
-                                                    size: 40,
+                                itemCount: filteredPortfolioItems.length,
+                                itemBuilder: (context, index) {
+                                  final item = filteredPortfolioItems[index];
+                                  return InkWell(
+                                    onTap:
+                                        () => _showPortfolioItemDetails(item),
+                                    child: Card(
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // Квадратное фото
+                                          SizedBox(
+                                            height: 200,
+                                            width: double.infinity,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                    top: Radius.circular(12),
                                                   ),
-                                                );
-                                              },
+                                              child: Image.network(
+                                                item.imageUrl,
+                                                fit: BoxFit.cover,
+                                                loadingBuilder: (
+                                                  context,
+                                                  child,
+                                                  loadingProgress,
+                                                ) {
+                                                  if (loadingProgress == null)
+                                                    return child;
+                                                  return const Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                          color: Color(
+                                                            0xFFFFD700,
+                                                          ),
+                                                        ),
+                                                  );
+                                                },
+                                                errorBuilder: (
+                                                  context,
+                                                  error,
+                                                  stackTrace,
+                                                ) {
+                                                  return Container(
+                                                    color: Colors.grey[300],
+                                                    child: const Icon(
+                                                      Icons.error_outline,
+                                                      color: Color(0xFFFFD700),
+                                                      size: 40,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Align(
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Align(
                                                   alignment: Alignment.topRight,
                                                   child: IconButton(
                                                     icon: Icon(
@@ -843,53 +845,88 @@ class _GenresPageState extends State<GenresPage> {
                                                       color: Colors.red,
                                                     ),
                                                     onPressed: () async {
-                                                      if (item.isFavorited) {
-                                                        await FavoriteService()
-                                                            .removeFromFavorites(
-                                                              item.id,
-                                                            );
-                                                      } else {
-                                                        await FavoriteService()
-                                                            .addToFavorites(
-                                                              item.id,
-                                                            );
+                                                      print(
+                                                        "Нажато сердце для фото ID: ${item.id}",
+                                                      );
+                                                      print(
+                                                        "Текущий статус isFavorited: ${item.isFavorited}",
+                                                      );
+
+                                                      try {
+                                                        if (!item.isFavorited) {
+                                                          // Добавляем в избранное
+                                                          print(
+                                                            "➡️ Пытаюсь добавить фото в избранное...",
+                                                          );
+                                                          await supabase
+                                                              .from('favorites')
+                                                              .insert({
+                                                                'portfolio_item_id':
+                                                                    item.id,
+                                                              });
+                                                          print(
+                                                            "✅ Фото добавлено в избранное",
+                                                          );
+                                                        } else {
+                                                          // Удаляем из избранного
+                                                          print(
+                                                            "➡️ Пытаюсь удалить фото из избранного...",
+                                                          );
+                                                          await supabase
+                                                              .from('favorites')
+                                                              .delete()
+                                                              .eq(
+                                                                'portfolio_item_id',
+                                                                item.id,
+                                                              );
+                                                          print(
+                                                            "✅ Фото удалено из избранного",
+                                                          );
+                                                        }
+
+                                                        setState(() {
+                                                          item.isFavorited =
+                                                              !item.isFavorited;
+                                                        });
+                                                      } catch (e) {
+                                                        print(
+                                                          "❌ Ошибка при обновлении избранного: $e",
+                                                        );
                                                       }
-                                                      setState(() {
-                                                        item.isFavorited =
-                                                            !item.isFavorited;
-                                                      });
                                                     },
                                                   ),
                                                 ),
-                                              Text(
-                                                item.title,
-                                                style: const TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black,
+                                                Text(
+                                                  item.title,
+                                                  style: const TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                '${item.photographerSurname ?? ''} ${item.photographerName ?? ''}',
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.black54,
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  '${item.photographerSurname ?? ''} ${item.photographerName ?? ''}',
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black54,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
+                                  );
+                                },
+                              ),
                             ),
                       ],
                     ),

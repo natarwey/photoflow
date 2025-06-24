@@ -28,6 +28,7 @@ class PortfolioItem {
     this.locationTitle,
     this.photographerSurname,
     this.photographerName,
+    this.isFavorited = false,
   });
   
   factory PortfolioItem.fromJson(Map<String, dynamic> json) {
@@ -48,6 +49,7 @@ class PortfolioItem {
       locationTitle: json['location']?['title'],
       photographerName: userData['name'],
       photographerSurname: userData['surname'],
+      isFavorited: false,
     );
   }
 }
