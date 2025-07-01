@@ -190,7 +190,7 @@ Future<void> _pickImage() async {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Фото успешно добавлено!'),
-            backgroundColor: Color(0xFFFFD700),
+            backgroundColor: Color(0xFFFF6B6B),
           ),
         );
       }
@@ -238,7 +238,7 @@ Future<void> _pickImage() async {
                           height: 200,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFFFFD700)),
+                            border: Border.all(color: const Color(0xFFFF6B6B)),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: ClipRRect(
@@ -272,7 +272,7 @@ Future<void> _pickImage() async {
                         icon: const Icon(Icons.photo_library),
                         label: Text(selectedImageName ?? 'Выбрать фото'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFFD700),
+                          backgroundColor: const Color(0xFFFF6B6B),
                           foregroundColor: Colors.black,
                         ),
                       ),
@@ -368,7 +368,7 @@ Future<void> _pickImage() async {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFD700),
+                    backgroundColor: const Color(0xFFFF6B6B),
                     foregroundColor: Colors.black,
                   ),
                   child: isAddingPhoto
@@ -490,7 +490,7 @@ Future<void> _pickImage() async {
                             child: const Center(
                               child: Icon(
                                 Icons.error_outline,
-                                color: Color(0xFFFFD700),
+                                color: Color(0xFFFF6B6B),
                                 size: 50,
                               ),
                             ),
@@ -539,7 +539,7 @@ Future<void> _pickImage() async {
                             children: [
                               const Icon(
                                 Icons.photo_album,
-                                color: Color(0xFFFFD700),
+                                color: Color(0xFFFF6B6B),
                                 size: 16,
                               ),
                               const SizedBox(width: 4),
@@ -556,7 +556,7 @@ Future<void> _pickImage() async {
                             children: [
                               const Icon(
                                 Icons.mood,
-                                color: Color(0xFFFFD700),
+                                color: Color(0xFFFF6B6B),
                                 size: 16,
                               ),
                               const SizedBox(width: 4),
@@ -573,7 +573,7 @@ Future<void> _pickImage() async {
                             children: [
                               const Icon(
                                 Icons.location_on,
-                                color: Color(0xFFFFD700),
+                                color: Color(0xFFFF6B6B),
                                 size: 16,
                               ),
                               const SizedBox(width: 4),
@@ -608,7 +608,7 @@ Future<void> _pickImage() async {
                   : 'Портфолио ${photographer!.name ?? ''} ${photographer!.surname ?? ''}'
               : 'Портфолио',
         ),
-        backgroundColor: const Color(0xFFFFD700),
+        backgroundColor: const Color(0xFFFF6B6B),
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
           // Кнопка добавления фото только для "Мое портфолио"
@@ -622,7 +622,7 @@ Future<void> _pickImage() async {
       ),
       body: isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFFFFD700)),
+              child: CircularProgressIndicator(color: Color(0xFFFF6B6B)),
             )
           : portfolioItems.isEmpty
               ? Center(
@@ -637,7 +637,7 @@ Future<void> _pickImage() async {
                           icon: const Icon(Icons.add_a_photo),
                           label: const Text('Добавить первое фото'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFFD700),
+                            backgroundColor: const Color(0xFFFF6B6B),
                             foregroundColor: Colors.black,
                           ),
                         ),
@@ -685,7 +685,7 @@ Future<void> _pickImage() async {
                                     if (loadingProgress == null) return child;
                                     return const Center(
                                       child: CircularProgressIndicator(
-                                        color: Color(0xFFFFD700),
+                                        color: Color(0xFFFF6B6B),
                                       ),
                                     );
                                   },
@@ -694,7 +694,7 @@ Future<void> _pickImage() async {
                                       color: Colors.grey[300],
                                       child: const Icon(
                                         Icons.error_outline,
-                                        color: Color(0xFFFFD700),
+                                        color: Color(0xFFFF6B6B),
                                         size: 40,
                                       ),
                                     );

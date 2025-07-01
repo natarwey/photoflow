@@ -38,12 +38,12 @@ class RecoveryPage extends StatelessWidget {
                 width: MediaQuery.of(context).size.width * 0.85,
                 child: TextField(
                   controller: emailController,
-                  cursorColor: const Color(0xFFFFD700),
+                  cursorColor: const Color(0xFFFF6B6B),
                   style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     prefixIcon: const Icon(
                       Icons.email,
-                      color: Color(0xFFFFD700),
+                      color: Color(0xFFFF6B6B),
                     ),
                     suffixIcon: IconButton(
                       onPressed: () async {
@@ -54,7 +54,7 @@ class RecoveryPage extends StatelessWidget {
                                 "Поле пустое",
                                 style: TextStyle(color: Colors.black),
                               ),
-                              backgroundColor: Color(0xFFFFD700),
+                              backgroundColor: Color(0xFFFF6B6B),
                             ),
                           );
                         } else {
@@ -65,7 +65,7 @@ class RecoveryPage extends StatelessWidget {
                                 "Письмо для восстановления отправлено",
                                 style: TextStyle(color: Colors.black),
                               ),
-                              backgroundColor: Color(0xFFFFD700),
+                              backgroundColor: Color(0xFFFF6B6B),
                             ),
                           );
                           emailController.clear();
@@ -73,18 +73,18 @@ class RecoveryPage extends StatelessWidget {
                       },
                       icon: const Icon(
                         Icons.send,
-                        color: Color(0xFFFFD700),
+                        color: Color(0xFFFF6B6B),
                       ),
                     ),
                     labelText: 'Email',
                     labelStyle: const TextStyle(color: Colors.black),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                      borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                      borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                     ),
                   ),
                 ),

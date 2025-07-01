@@ -129,11 +129,11 @@ Widget build(BuildContext context) {
     backgroundColor: const Color(0xFFEEEEEE),
     appBar: AppBar(
       title: const Text('Идеи поз'),
-      backgroundColor: const Color(0xFFFFD700),
+      backgroundColor: const Color(0xFFFF6B6B),
       iconTheme: const IconThemeData(color: Colors.black),
     ),
     body: isLoading
-        ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)))
+        ? const Center(child: CircularProgressIndicator(color: Color(0xFFFF6B6B)))
         : Column(
             children: [
               Padding(
@@ -160,7 +160,7 @@ Widget build(BuildContext context) {
                           ? _loadMorePhotos
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFFD700),
+                        backgroundColor: const Color(0xFFFF6B6B),
                         foregroundColor: Colors.black,
                       ),
                       child: const Text('Еще'),
@@ -196,7 +196,7 @@ Widget build(BuildContext context) {
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
                               return const Center(
-                                child: CircularProgressIndicator(color: Color(0xFFFFD700)),
+                                child: CircularProgressIndicator(color: Color(0xFFFF6B6B)),
                               );
                             },
                           ),

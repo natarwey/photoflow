@@ -42,22 +42,22 @@ class _AuthPageState extends State<AuthPage> {
                 width: MediaQuery.of(context).size.width * 0.85,
                 child: TextField(
                   controller: emailController,
-                  cursorColor: const Color(0xFFFFD700),
+                  cursorColor: const Color(0xFFFF6B6B),
                   style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     prefixIcon: const Icon(
                       Icons.email,
-                      color: Color(0xFFFFD700),
+                      color: Color(0xFFFF6B6B),
                     ),
                     labelText: 'Почта',
                     labelStyle: const TextStyle(color: Colors.black),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                      borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                      borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                     ),
                   ),
                 ),
@@ -68,22 +68,22 @@ class _AuthPageState extends State<AuthPage> {
                 child: TextField(
                   controller: passController,
                   obscureText: true,
-                  cursorColor: const Color(0xFFFFD700),
+                  cursorColor: const Color(0xFFFF6B6B),
                   style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     prefixIcon: const Icon(
                       Icons.password,
-                      color: Color(0xFFFFD700),
+                      color: Color(0xFFFF6B6B),
                     ),
                     labelText: 'Пароль',
                     labelStyle: const TextStyle(color: Colors.black),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                      borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                      borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                     ),
                   ),
                 ),
@@ -121,7 +121,7 @@ class _AuthPageState extends State<AuthPage> {
                                     "Поля пустые!",
                                     style: TextStyle(color: Colors.black),
                                   ),
-                                  backgroundColor: Color(0xFFFFD700),
+                                  backgroundColor: Color(0xFFFF6B6B),
                                 ),
                               );
                               return;
@@ -163,7 +163,7 @@ class _AuthPageState extends State<AuthPage> {
                                       "Неверный email или пароль",
                                       style: TextStyle(color: Colors.black),
                                     ),
-                                    backgroundColor: Color(0xFFFFD700),
+                                    backgroundColor: Color(0xFFFF6B6B),
                                   ),
                                 );
                               }
@@ -177,7 +177,7 @@ class _AuthPageState extends State<AuthPage> {
                                     "Ошибка: $e",
                                     style: const TextStyle(color: Colors.black),
                                   ),
-                                  backgroundColor: const Color(0xFFFFD700),
+                                  backgroundColor: const Color(0xFFFF6B6B),
                                 ),
                               );
                             } finally {
@@ -187,7 +187,7 @@ class _AuthPageState extends State<AuthPage> {
                             }
                           },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFD700),
+                    backgroundColor: const Color(0xFFFF6B6B),
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -221,7 +221,7 @@ class _AuthPageState extends State<AuthPage> {
                     Navigator.popAndPushNamed(context, '/reg');
                   },
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFFFFD700), width: 2),
+                    side: const BorderSide(color: Color(0xFFFF6B6B), width: 2),
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(

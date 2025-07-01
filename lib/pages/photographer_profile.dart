@@ -54,7 +54,7 @@ class _PhotographerProfilePageState extends State<PhotographerProfilePage> {
     return Scaffold(
       backgroundColor: const Color(0xFFEEEEEE),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFFD700), 
+        backgroundColor: const Color(0xFFFF6B6B), 
         title: Text(
           photographer != null
               ? '${photographer!.name ?? ''} ${photographer!.surname ?? ''}'
@@ -69,7 +69,7 @@ class _PhotographerProfilePageState extends State<PhotographerProfilePage> {
       body:
           isLoading
               ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFFFFD700)),
+                child: CircularProgressIndicator(color: Color(0xFFFF6B6B)),
               )
               : photographer == null
               ? const Center(
@@ -98,7 +98,7 @@ class _PhotographerProfilePageState extends State<PhotographerProfilePage> {
                                   ? const Icon(
                                     Icons.person,
                                     size: 60,
-                                    color: Color(0xFFFFD700),
+                                    color: Color(0xFFFF6B6B),
                                   )
                                   : null,
                         ),
@@ -145,7 +145,7 @@ class _PhotographerProfilePageState extends State<PhotographerProfilePage> {
                           children: [
                             const Icon(
                               Icons.location_on,
-                              color: Color(0xFFFFD700),
+                              color: Color(0xFFFF6B6B),
                             ),
                             const SizedBox(width: 5),
                             Text(
@@ -164,7 +164,7 @@ class _PhotographerProfilePageState extends State<PhotographerProfilePage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.work, color: Color(0xFFFFD700)),
+                              const Icon(Icons.work, color: Color(0xFFFF6B6B)),
                               const SizedBox(width: 5),
                               Text(
                                 'Опыт: ${photographer!.experience} ${_getYearsText(photographer!.experience!)}',
@@ -185,7 +185,7 @@ class _PhotographerProfilePageState extends State<PhotographerProfilePage> {
                             children: [
                               const Icon(
                                 Icons.monetization_on,
-                                color: Color(0xFFFFD700),
+                                color: Color(0xFFFF6B6B),
                               ),
                               const SizedBox(width: 5),
                               Text(
@@ -206,7 +206,7 @@ class _PhotographerProfilePageState extends State<PhotographerProfilePage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.link, color: Color(0xFFFFD700)),
+                              const Icon(Icons.link, color: Color(0xFFFF6B6B)),
                               const SizedBox(width: 5),
                               Flexible(
                                 child: GestureDetector(
@@ -254,7 +254,7 @@ class _PhotographerProfilePageState extends State<PhotographerProfilePage> {
                           icon: const Icon(Icons.photo_library),
                           label: const Text('Портфолио'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFFD700),
+                            backgroundColor: const Color(0xFFFF6B6B),
                             foregroundColor: Colors.black,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 20,
@@ -278,7 +278,7 @@ class _PhotographerProfilePageState extends State<PhotographerProfilePage> {
                         //           'Добавлено в избранное',
                         //           style: TextStyle(color: Colors.black),
                         //         ),
-                        //         backgroundColor: Color(0xFFFFD700),
+                        //         backgroundColor: Color(0xFFFF6B6B),
                         //       ),
                         //     );
                         //   },
@@ -287,7 +287,7 @@ class _PhotographerProfilePageState extends State<PhotographerProfilePage> {
                         //   style: OutlinedButton.styleFrom(
                         //     foregroundColor: Colors.black,
                         //     side: const BorderSide(
-                        //       color: Color(0xFFFFD700),
+                        //       color: Color(0xFFFF6B6B),
                         //       width: 2,
                         //     ),
                         //     padding: const EdgeInsets.symmetric(

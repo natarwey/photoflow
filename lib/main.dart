@@ -33,10 +33,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'PhotoFlow',
       theme: ThemeData(
-        primaryColor: const Color(0xFFFFD700), // Золотой цвет #FFD700
+        primaryColor: const Color(0xFFFF6B6B), // Золотой цвет #FFD700
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFFFD700),
-          primary: const Color(0xFFFFD700),
+          seedColor: const Color(0xFFFF6B6B),
+          primary: const Color(0xFFFF6B6B),
         ),
         textTheme: const TextTheme(
           bodyMedium: TextStyle(color: Colors.black),
@@ -44,13 +44,13 @@ class MyApp extends StatelessWidget {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFFFD700), // Золотой цвет для кнопок
+            backgroundColor: const Color(0xFFFF6B6B), // Золотой цвет для кнопок
             foregroundColor: Colors.black, // Черный текст на кнопках
           ),
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: Color(0xFFFFD700)), // Золотая обводка
+            side: const BorderSide(color: Color(0xFFFF6B6B)), // Золотая обводка
             foregroundColor: Colors.black, // Черный текст
           ),
         ),
@@ -58,11 +58,11 @@ class MyApp extends StatelessWidget {
           labelStyle: const TextStyle(color: Colors.black),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
-            borderSide: const BorderSide(color: Color(0xFFFFD700)),
+            borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
-            borderSide: const BorderSide(color: Color(0xFFFFD700)),
+            borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
           ),
         ),
       ),
@@ -115,7 +115,7 @@ class _AuthCheckPageState extends State<AuthCheckPage> {
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(
-            color: Color(0xFFFFD700),
+            color: Color(0xFFFF6B6B),
           ),
         ),
       );

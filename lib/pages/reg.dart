@@ -76,21 +76,21 @@ class _RegPageState extends State<RegPage> {
                   child: TextField(
                     controller: surnameController,
                     style: const TextStyle(color: Colors.black),
-                    cursorColor: const Color(0xFFFFD700),
+                    cursorColor: const Color(0xFFFF6B6B),
                     decoration: InputDecoration(
                       prefixIcon: const Icon(
                         Icons.person,
-                        color: Color(0xFFFFD700),
+                        color: Color(0xFFFF6B6B),
                       ),
                       labelText: 'Фамилия',
                       labelStyle: const TextStyle(color: Colors.black),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                        borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                        borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                       ),
                     ),
                   ),
@@ -101,21 +101,21 @@ class _RegPageState extends State<RegPage> {
                   child: TextField(
                     controller: nameController,
                     style: const TextStyle(color: Colors.black),
-                    cursorColor: const Color(0xFFFFD700),
+                    cursorColor: const Color(0xFFFF6B6B),
                     decoration: InputDecoration(
                       prefixIcon: const Icon(
                         Icons.person,
-                        color: Color(0xFFFFD700),
+                        color: Color(0xFFFF6B6B),
                       ),
                       labelText: 'Имя',
                       labelStyle: const TextStyle(color: Colors.black),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                        borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                        borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                       ),
                     ),
                   ),
@@ -126,21 +126,21 @@ class _RegPageState extends State<RegPage> {
                   child: TextField(
                     controller: emailController,
                     style: const TextStyle(color: Colors.black),
-                    cursorColor: const Color(0xFFFFD700),
+                    cursorColor: const Color(0xFFFF6B6B),
                     decoration: InputDecoration(
                       prefixIcon: const Icon(
                         Icons.email,
-                        color: Color(0xFFFFD700),
+                        color: Color(0xFFFF6B6B),
                       ),
                       labelText: 'Почта',
                       labelStyle: const TextStyle(color: Colors.black),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                        borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                        borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                       ),
                     ),
                   ),
@@ -152,21 +152,21 @@ class _RegPageState extends State<RegPage> {
                     controller: passController,
                     obscureText: true,
                     style: const TextStyle(color: Colors.black),
-                    cursorColor: const Color(0xFFFFD700),
+                    cursorColor: const Color(0xFFFF6B6B),
                     decoration: InputDecoration(
                       prefixIcon: const Icon(
                         Icons.password,
-                        color: Color(0xFFFFD700),
+                        color: Color(0xFFFF6B6B),
                       ),
                       labelText: 'Пароль',
                       labelStyle: const TextStyle(color: Colors.black),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                        borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                        borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                       ),
                     ),
                   ),
@@ -178,21 +178,21 @@ class _RegPageState extends State<RegPage> {
                     controller: repeatController,
                     obscureText: true,
                     style: const TextStyle(color: Colors.black),
-                    cursorColor: const Color(0xFFFFD700),
+                    cursorColor: const Color(0xFFFF6B6B),
                     decoration: InputDecoration(
                       prefixIcon: const Icon(
                         Icons.password,
-                        color: Color(0xFFFFD700),
+                        color: Color(0xFFFF6B6B),
                       ),
                       labelText: 'Повторный пароль',
                       labelStyle: const TextStyle(color: Colors.black),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                        borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                        borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
                       ),
                     ),
                   ),
@@ -211,7 +211,7 @@ class _RegPageState extends State<RegPage> {
                       fillColor: MaterialStateProperty.resolveWith<Color>((
                         Set<MaterialState> states,
                       ) {
-                        return const Color(0xFFFFD700);
+                        return const Color(0xFFFF6B6B);
                       }),
                       checkColor: Colors.black,
                     ),
@@ -235,18 +235,18 @@ class _RegPageState extends State<RegPage> {
                         labelStyle: const TextStyle(color: Colors.black),
                         prefixIcon: const Icon(
                           Icons.location_city,
-                          color: Color(0xFFFFD700),
+                          color: Color(0xFFFF6B6B),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6),
                           borderSide: const BorderSide(
-                            color: Color(0xFFFFD700),
+                            color: Color(0xFFFF6B6B),
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6),
                           borderSide: const BorderSide(
-                            color: Color(0xFFFFD700),
+                            color: Color(0xFFFF6B6B),
                           ),
                         ),
                       ),
@@ -285,7 +285,7 @@ class _RegPageState extends State<RegPage> {
                                       "Поля пустые",
                                       style: TextStyle(color: Colors.black),
                                     ),
-                                    backgroundColor: Color(0xFFFFD700),
+                                    backgroundColor: Color(0xFFFF6B6B),
                                   ),
                                 );
                                 return;
@@ -299,7 +299,7 @@ class _RegPageState extends State<RegPage> {
                                       "Пароли не совпадают",
                                       style: TextStyle(color: Colors.black),
                                     ),
-                                    backgroundColor: Color(0xFFFFD700),
+                                    backgroundColor: Color(0xFFFF6B6B),
                                   ),
                                 );
                                 return;
@@ -340,7 +340,7 @@ class _RegPageState extends State<RegPage> {
                                               color: Colors.black,
                                             ),
                                           ),
-                                          backgroundColor: Color(0xFFFFD700),
+                                          backgroundColor: Color(0xFFFF6B6B),
                                         ),
                                       );
                                       setState(() {
@@ -366,7 +366,7 @@ class _RegPageState extends State<RegPage> {
                                           color: Colors.black,
                                         ),
                                       ),
-                                      backgroundColor: const Color(0xFFFFD700),
+                                      backgroundColor: const Color(0xFFFF6B6B),
                                     ),
                                   );
 
@@ -381,7 +381,7 @@ class _RegPageState extends State<RegPage> {
                                           color: Colors.black,
                                         ),
                                       ),
-                                      backgroundColor: const Color(0xFFFFD700),
+                                      backgroundColor: const Color(0xFFFF6B6B),
                                     ),
                                   );
                                 }
@@ -397,7 +397,7 @@ class _RegPageState extends State<RegPage> {
                                         color: Colors.black,
                                       ),
                                     ),
-                                    backgroundColor: const Color(0xFFFFD700),
+                                    backgroundColor: const Color(0xFFFF6B6B),
                                   ),
                                 );
                               } finally {
@@ -407,7 +407,7 @@ class _RegPageState extends State<RegPage> {
                               }
                             },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFD700),
+                      backgroundColor: const Color(0xFFFF6B6B),
                       foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -442,7 +442,7 @@ class _RegPageState extends State<RegPage> {
                     },
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(
-                        color: Color(0xFFFFD700),
+                        color: Color(0xFFFF6B6B),
                         width: 2,
                       ),
                       foregroundColor: Colors.black,
