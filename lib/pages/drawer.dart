@@ -113,7 +113,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             ? NetworkImage(avatarUrl!)
                             : null,
                         child: avatarUrl == null
-                            ? Icon(
+                            ? const Icon(
                                 Icons.person,
                                 size: 40,
                                 color: Color(0xFFFFD700),
@@ -154,11 +154,14 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
                     final int photographerId = photographerData['id'];
 
-                    // Переходим на страницу портфолио
+                    // Переходим на страницу портфолио с флагом "Мое портфолио"
                     Navigator.pushNamed(
                       context,
                       '/portfolio',
-                      arguments: photographerId,
+                      arguments: {
+                        'photographerId': photographerId,
+                        'isMyPortfolio': true, // Важный флаг!
+                      },
                     );
                   } catch (e) {
                     if (kDebugMode) {
