@@ -393,29 +393,45 @@ class _HomePageState extends State<HomePage> {
                 ),
                 itemCount: genres.length,
                 itemBuilder: (context, index) {
-                  return ElevatedButton(
-                    onPressed: () {
+                  String genreImage =
+                      'images/genres/${genres[index].title.toLowerCase().replaceAll(' ', '_')}.jpg';
+                  return InkWell(
+                    onTap: () {
                       Navigator.pushNamed(
                         context,
                         '/genres',
                         arguments: genres[index],
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF6B6B),
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: Text(
-                      genres[index].title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
+                    child: Stack(
+                      children: [
+                        // Фоновое изображение
+                        SizedBox.expand(
+                          child: Image.asset(genreImage, fit: BoxFit.cover),
+                        ),
+                        // Затемняющий слой
+                        const SizedBox.expand(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color:
+                                  Colors
+                                      .black54, // Можно регулировать прозрачность
+                            ),
+                          ),
+                        ),
+                        // Текст на кнопке
+                        Center(
+                          child: Text(
+                            genres[index].title,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 },
