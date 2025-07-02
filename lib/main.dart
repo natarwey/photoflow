@@ -55,10 +55,10 @@ class _MyAppState extends State<MyApp> {
   //   setState(() {
   //     _theme = ThemeData(
   //       brightness: _isDarkMode ? Brightness.dark : Brightness.light,
-  //       primaryColor: const Color(0xFFFF6B6B),
+  //       primaryColor: const Color.fromARGB(255, 139, 139, 139),
   //       colorScheme: ColorScheme.fromSeed(
-  //         seedColor: const Color(0xFFFF6B6B),
-  //         primary: const Color(0xFFFF6B6B),
+  //         seedColor: const Color.fromARGB(255, 139, 139, 139),
+  //         primary: const Color.fromARGB(255, 139, 139, 139),
   //         brightness: _isDarkMode ? Brightness.dark : Brightness.light,
   //       ),
   //       textTheme: TextTheme(
@@ -67,13 +67,13 @@ class _MyAppState extends State<MyApp> {
   //       ),
   //       elevatedButtonTheme: ElevatedButtonThemeData(
   //         style: ElevatedButton.styleFrom(
-  //           backgroundColor: const Color(0xFFFF6B6B),
+  //           backgroundColor: const Color.fromARGB(255, 139, 139, 139),
   //           foregroundColor: Colors.black,
   //         ),
   //       ),
   //       outlinedButtonTheme: OutlinedButtonThemeData(
   //         style: OutlinedButton.styleFrom(
-  //           side: const BorderSide(color: Color(0xFFFF6B6B)),
+  //           side: const BorderSide(color: Color.fromARGB(255, 139, 139, 139)),
   //           foregroundColor: _isDarkMode ? Colors.white : Colors.black,
   //         ),
   //       ),
@@ -81,11 +81,11 @@ class _MyAppState extends State<MyApp> {
   //         labelStyle: TextStyle(color: _isDarkMode ? Colors.white : Colors.black),
   //         focusedBorder: OutlineInputBorder(
   //           borderRadius: BorderRadius.circular(20),
-  //           borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
+  //           borderSide: const BorderSide(color: Color.fromARGB(255, 139, 139, 139)),
   //         ),
   //         enabledBorder: OutlineInputBorder(
   //           borderRadius: BorderRadius.circular(20),
-  //           borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
+  //           borderSide: const BorderSide(color: Color.fromARGB(255, 139, 139, 139)),
   //         ),
   //       ),
   //       scaffoldBackgroundColor: _isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
@@ -135,10 +135,10 @@ class _MyAppState extends State<MyApp> {
 ThemeData _buildLightTheme() {
   return ThemeData(
     brightness: Brightness.light,
-    primaryColor: const Color(0xFFFF6B6B),
+    primaryColor: const Color.fromARGB(255, 139, 139, 139),
     colorScheme: ColorScheme.light(
-      primary: const Color(0xFFFF6B6B),
-      secondary: const Color(0xFFFF6B6B),
+      primary: const Color.fromARGB(255, 139, 139, 139),
+      secondary: const Color.fromARGB(255, 139, 139, 139),
       surface: const Color(0xFFF8F9FA),
       background: const Color(0xFFF8F9FA),
     ),
@@ -160,15 +160,15 @@ ThemeData _buildLightTheme() {
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: const Color(0xFFFF6B6B)),
+        borderSide: BorderSide(color: const Color.fromARGB(255, 139, 139, 139)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: const Color(0xFFFF6B6B)),
+        borderSide: BorderSide(color: const Color.fromARGB(255, 139, 139, 139)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: const Color(0xFFFF6B6B), width: 2),
+        borderSide: BorderSide(color: const Color.fromARGB(255, 139, 139, 139), width: 2),
       ),
       labelStyle: TextStyle(color: Colors.black54),
     ),
@@ -177,10 +177,10 @@ ThemeData _buildLightTheme() {
 
 ThemeData _buildDarkTheme() {
   return ThemeData.dark().copyWith(
-    primaryColor: const Color(0xFFFF6B6B),
+    primaryColor: const Color.fromARGB(255, 139, 139, 139),
     colorScheme: ColorScheme.dark(
-      primary: const Color(0xFFFF6B6B),
-      secondary: const Color(0xFFFF6B6B),
+      primary: const Color.fromARGB(255, 139, 139, 139),
+      secondary: const Color.fromARGB(255, 139, 139, 139),
       surface: const Color(0xFF121212),
       background: const Color(0xFF121212),
     ),
@@ -202,15 +202,15 @@ ThemeData _buildDarkTheme() {
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: const Color(0xFFFF6B6B)),
+        borderSide: BorderSide(color: const Color.fromARGB(255, 139, 139, 139)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: const Color(0xFFFF6B6B)),
+        borderSide: BorderSide(color: const Color.fromARGB(255, 139, 139, 139)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: const Color(0xFFFF6B6B), width: 2),
+        borderSide: BorderSide(color: const Color.fromARGB(255, 139, 139, 139), width: 2),
       ),
       labelStyle: TextStyle(color: Colors.white70),
     ),
@@ -255,7 +255,7 @@ class _AuthCheckPageState extends State<AuthCheckPage> {
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(
-            color: Color(0xFFFF6B6B),
+            color: Color.fromARGB(255, 139, 139, 139),
           ),
         ),
       );

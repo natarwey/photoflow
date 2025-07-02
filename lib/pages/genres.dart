@@ -286,7 +286,7 @@ class _GenresPageState extends State<GenresPage> {
                       min: minPrice,
                       max: maxPrice,
                       divisions: 20,
-                      activeColor: const Color(0xFFFF6B6B),
+                      activeColor: const Color.fromARGB(255, 139, 139, 139),
                       inactiveColor: Colors.grey[300],
                       labels: RangeLabels(
                         '${priceRange.start.round()} ₽',
@@ -322,7 +322,7 @@ class _GenresPageState extends State<GenresPage> {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF6B6B),
+                    backgroundColor: const Color.fromARGB(255, 139, 139, 139),
                     foregroundColor: Colors.black,
                   ),
                   child: const Text('Применить'),
@@ -363,7 +363,7 @@ class _GenresPageState extends State<GenresPage> {
                             child: const Center(
                               child: Icon(
                                 Icons.error_outline,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                                 size: 50,
                               ),
                             ),
@@ -420,7 +420,7 @@ class _GenresPageState extends State<GenresPage> {
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFFF6B6B),
+                                  backgroundColor: const Color.fromARGB(255, 139, 139, 139),
                                   foregroundColor: Colors.black,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8,
@@ -441,7 +441,7 @@ class _GenresPageState extends State<GenresPage> {
                             children: [
                               const Icon(
                                 Icons.photo_album,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                                 size: 16,
                               ),
                               const SizedBox(width: 4),
@@ -458,7 +458,7 @@ class _GenresPageState extends State<GenresPage> {
                             children: [
                               const Icon(
                                 Icons.mood,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                                 size: 16,
                               ),
                               const SizedBox(width: 4),
@@ -475,7 +475,7 @@ class _GenresPageState extends State<GenresPage> {
                             children: [
                               const Icon(
                                 Icons.location_on,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                                 size: 16,
                               ),
                               const SizedBox(width: 4),
@@ -505,7 +505,7 @@ class _GenresPageState extends State<GenresPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFEEEEEE),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFF6B6B),
+        backgroundColor: const Color.fromARGB(255, 139, 139, 139),
         title: Text(
           genre.title,
           style: const TextStyle(
@@ -535,7 +535,7 @@ class _GenresPageState extends State<GenresPage> {
                               : 'Поиск фотографий',
                       prefixIcon: const Icon(
                         Icons.search,
-                        color: Color(0xFFFF6B6B),
+                        color: Color.fromARGB(255, 139, 139, 139),
                       ),
                       filled: true,
                       fillColor: Colors.white,
@@ -545,10 +545,10 @@ class _GenresPageState extends State<GenresPage> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFFF6B6B)),
+                        borderSide: const BorderSide(color: Color.fromARGB(255, 139, 139, 139)),
                       ),
                     ),
-                    cursorColor: const Color(0xFFFF6B6B),
+                    cursorColor: const Color.fromARGB(255, 139, 139, 139),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -557,7 +557,7 @@ class _GenresPageState extends State<GenresPage> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF6B6B),
+                      color: const Color.fromARGB(255, 139, 139, 139),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(Icons.filter_list, color: Colors.black),
@@ -581,9 +581,9 @@ class _GenresPageState extends State<GenresPage> {
                           text: 'Фотографии',
                         ),
                       ],
-                      labelColor: const Color(0xFFFF6B6B),
+                      labelColor: const Color.fromARGB(255, 139, 139, 139),
                       unselectedLabelColor: Colors.black54,
-                      indicatorColor: const Color(0xFFFF6B6B),
+                      indicatorColor: const Color.fromARGB(255, 139, 139, 139),
                       onTap: (index) {
                         setState(() {
                           _currentTabIndex = index;
@@ -600,7 +600,7 @@ class _GenresPageState extends State<GenresPage> {
                         isLoadingPhotographers
                             ? const Center(
                               child: CircularProgressIndicator(
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                               ),
                             )
                             : filteredPhotographers.isEmpty
@@ -659,7 +659,7 @@ class _GenresPageState extends State<GenresPage> {
                                                   color: Colors.grey[300],
                                                   child: const Icon(
                                                     Icons.person,
-                                                    color: Color(0xFFFF6B6B),
+                                                    color: Color.fromARGB(255, 139, 139, 139),
                                                     size: 40,
                                                   ),
                                                 );
@@ -686,7 +686,7 @@ class _GenresPageState extends State<GenresPage> {
                                                   children: [
                                                     const Icon(
                                                       Icons.location_on,
-                                                      color: Color(0xFFFF6B6B),
+                                                      color: Color.fromARGB(255, 139, 139, 139),
                                                       size: 14,
                                                     ),
                                                     const SizedBox(width: 4),
@@ -707,9 +707,7 @@ class _GenresPageState extends State<GenresPage> {
                                                     children: [
                                                       const Icon(
                                                         Icons.monetization_on,
-                                                        color: Color(
-                                                          0xFFFF6B6B,
-                                                        ),
+                                                        color: Color.fromARGB(255, 139, 139, 139),
                                                         size: 14,
                                                       ),
                                                       const SizedBox(width: 4),
@@ -730,7 +728,7 @@ class _GenresPageState extends State<GenresPage> {
                                           // Стрелка вправо
                                           const Icon(
                                             Icons.arrow_forward_ios,
-                                            color: Color(0xFFFF6B6B),
+                                            color: Color.fromARGB(255, 139, 139, 139),
                                             size: 16,
                                           ),
                                         ],
@@ -745,7 +743,7 @@ class _GenresPageState extends State<GenresPage> {
                         isLoadingPortfolio
                             ? const Center(
                               child: CircularProgressIndicator(
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                               ),
                             )
                             : filteredPortfolioItems.isEmpty
@@ -820,7 +818,7 @@ class _GenresPageState extends State<GenresPage> {
                                                     color: Colors.grey[300],
                                                     child: const Icon(
                                                       Icons.error_outline,
-                                                      color: Color(0xFFFF6B6B),
+                                                      color: Color.fromARGB(255, 139, 139, 139),
                                                       size: 40,
                                                     ),
                                                   );

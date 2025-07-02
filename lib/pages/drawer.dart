@@ -93,7 +93,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 Navigator.pushNamed(context, '/user_profile');
               },
               child: UserAccountsDrawerHeader(
-                decoration: const BoxDecoration(color: Color(0xFFFF6B6B)),
+                decoration: const BoxDecoration(color: Color.fromARGB(255, 139, 139, 139)),
                 accountName: Text(
                   isLoading ? 'Загрузка...' : userName,
                   style: const TextStyle(
@@ -116,14 +116,14 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             ? const Icon(
                                 Icons.person,
                                 size: 40,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                               )
                             : null,
                       ),
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.home, color: Color(0xFFFF6B6B)),
+              leading: const Icon(Icons.home, color: Color.fromARGB(255, 139, 139, 139)),
               title: const Text(
                 'Главная',
                 style: TextStyle(color: Colors.black),
@@ -136,7 +136,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             if (isPhotographer)
               ListTile(
                 leading:
-                    const Icon(Icons.photo_camera, color: Color(0xFFFF6B6B)),
+                    const Icon(Icons.photo_camera, color: Color.fromARGB(255, 139, 139, 139)),
                 title: const Text(
                   'Мое портфолио',
                   style: TextStyle(color: Colors.black),
@@ -173,7 +173,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ),
             ListTile(
               leading:
-                  const Icon(Icons.location_on, color: Color(0xFFFF6B6B)),
+                  const Icon(Icons.location_on, color: Color.fromARGB(255, 139, 139, 139)),
               title: const Text(
                 'Идеи поз',
                 style: TextStyle(color: Colors.black),
@@ -184,7 +184,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.favorite, color: Color(0xFFFF6B6B)),
+              leading: const Icon(Icons.favorite, color: Color.fromARGB(255, 139, 139, 139)),
               title: const Text(
                 'Избранные фото',
                 style: TextStyle(color: Colors.black),
@@ -196,7 +196,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             ),
             const Divider(color: Colors.black26),
             ListTile(
-                  leading: const Icon(Icons.settings, color: Color(0xFFFF6B6B)),
+                  leading: const Icon(Icons.settings, color: Color.fromARGB(255, 139, 139, 139)),
                   title: Text(
                     'Настройки',
                     style: TextStyle(color: Colors.black),
@@ -208,7 +208,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 ),
             ListTile(
               leading:
-                  const Icon(Icons.exit_to_app, color: Color(0xFFFF6B6B)),
+                  const Icon(Icons.exit_to_app, color: Color.fromARGB(255, 139, 139, 139)),
               title: const Text('Выйти', style: TextStyle(color: Colors.black)),
               onTap: () async {
                 await _authService.signOut();

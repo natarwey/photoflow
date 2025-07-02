@@ -114,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                             child: const Center(
                               child: Icon(
                                 Icons.error_outline,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                                 size: 50,
                               ),
                             ),
@@ -172,7 +172,7 @@ class _HomePageState extends State<HomePage> {
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFFF6B6B),
+                                  backgroundColor: const Color.fromARGB(255, 139, 139, 139),
                                   foregroundColor: Colors.black,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8,
@@ -193,7 +193,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               const Icon(
                                 Icons.photo_album,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                                 size: 16,
                               ),
                               const SizedBox(width: 4),
@@ -209,7 +209,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               const Icon(
                                 Icons.mood,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                                 size: 16,
                               ),
                               const SizedBox(width: 4),
@@ -225,7 +225,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               const Icon(
                                 Icons.location_on,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                                 size: 16,
                               ),
                               const SizedBox(width: 4),
@@ -252,7 +252,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: const Color(0xFFEEEEEE),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFF6B6B),
+        backgroundColor: const Color.fromARGB(255, 139, 139, 139),
         title: const Text(
           'Главная',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
@@ -314,7 +314,7 @@ class _HomePageState extends State<HomePage> {
                                 color: Colors.grey[300],
                                 child: const Center(
                                   child: CircularProgressIndicator(
-                                    color: Color(0xFFFF6B6B),
+                                    color: Color.fromARGB(255, 139, 139, 139),
                                   ),
                                 ),
                               );
@@ -326,7 +326,7 @@ class _HomePageState extends State<HomePage> {
                                 child: const Center(
                                   child: Icon(
                                     Icons.error_outline,
-                                    color: Color(0xFFFF6B6B),
+                                    color: Color.fromARGB(255, 139, 139, 139),
                                     size: 50,
                                   ),
                                 ),
@@ -347,7 +347,7 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: const Center(
-                    child: CircularProgressIndicator(color: Color(0xFFFF6B6B)),
+                    child: CircularProgressIndicator(color: Color.fromARGB(255, 139, 139, 139)),
                   ),
                 ),
 
@@ -355,9 +355,9 @@ class _HomePageState extends State<HomePage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF6B6B).withOpacity(0.2),
+                  color: const Color.fromARGB(255, 139, 139, 139).withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFFF6B6B)),
+                  border: Border.all(color: const Color.fromARGB(255, 139, 139, 139)),
                 ),
                 child: Text(
                   currentIdea?.moodTitle ?? 'Нет настроения',

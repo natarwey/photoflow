@@ -74,7 +74,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                             child: const Center(
                               child: Icon(
                                 Icons.error_outline,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                                 size: 50,
                               ),
                             ),
@@ -131,7 +131,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFFF6B6B),
+                                  backgroundColor: const Color.fromARGB(255, 139, 139, 139),
                                   foregroundColor: Colors.black,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8,
@@ -152,7 +152,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                             children: [
                               const Icon(
                                 Icons.photo_album,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                                 size: 16,
                               ),
                               const SizedBox(width: 4),
@@ -169,7 +169,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                             children: [
                               const Icon(
                                 Icons.mood,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                                 size: 16,
                               ),
                               const SizedBox(width: 4),
@@ -186,7 +186,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                             children: [
                               const Icon(
                                 Icons.location_on,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                                 size: 16,
                               ),
                               const SizedBox(width: 4),
@@ -214,12 +214,12 @@ class _FavoritesPageState extends State<FavoritesPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Избранные фото'),
-        backgroundColor: const Color(0xFFFF6B6B),
+        backgroundColor: const Color.fromARGB(255, 139, 139, 139),
       ),
       body:
           isLoading
               ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFFFF6B6B)),
+                child: CircularProgressIndicator(color: Color.fromARGB(255, 139, 139, 139)),
               )
               : GridView.builder(
                 padding: const EdgeInsets.all(16),
@@ -261,7 +261,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                   if (loadingProgress == null) return child;
                                   return const Center(
                                     child: CircularProgressIndicator(
-                                      color: Color(0xFFFF6B6B),
+                                      color: Color.fromARGB(255, 139, 139, 139),
                                     ),
                                   );
                                 },
@@ -270,7 +270,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                     color: Colors.grey[300],
                                     child: const Icon(
                                       Icons.error_outline,
-                                      color: Color(0xFFFF6B6B),
+                                      color: Color.fromARGB(255, 139, 139, 139),
                                       size: 40,
                                     ),
                                   );

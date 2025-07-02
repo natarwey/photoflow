@@ -122,7 +122,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return Scaffold(
       backgroundColor: const Color(0xFFEEEEEE),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFF6B6B),
+        backgroundColor: const Color.fromARGB(255, 139, 139, 139),
         title: const Text(
           'Мой профиль',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
@@ -133,7 +133,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       body:
           isLoading
               ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFFFF6B6B)),
+                child: CircularProgressIndicator(color: Color.fromARGB(255, 139, 139, 139)),
               )
               : user == null
               ? const Center(
@@ -160,7 +160,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 ? const Icon(
                                     Icons.person,
                                     size: 60,
-                                    color: Color(0xFFFF6B6B),
+                                    color: Color.fromARGB(255, 139, 139, 139),
                                   )
                                 : null,
                           ),
@@ -184,7 +184,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             children: [
                               const Icon(
                                 Icons.email,
-                                color: Color(0xFFFF6B6B),
+                                color: Color.fromARGB(255, 139, 139, 139),
                               ),
                               const SizedBox(width: 5),
                               Text(
@@ -229,7 +229,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               children: [
                                 const Icon(
                                   Icons.location_on,
-                                  color: Color(0xFFFF6B6B),
+                                  color: Color.fromARGB(255, 139, 139, 139),
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
@@ -250,7 +250,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 children: [
                                   const Icon(
                                     Icons.work,
-                                    color: Color(0xFFFF6B6B),
+                                    color: Color.fromARGB(255, 139, 139, 139),
                                   ),
                                   const SizedBox(width: 5),
                                   Text(
@@ -272,7 +272,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 children: [
                                   const Icon(
                                     Icons.monetization_on,
-                                    color: Color(0xFFFF6B6B),
+                                    color: Color.fromARGB(255, 139, 139, 139),
                                   ),
                                   const SizedBox(width: 5),
                                   Text(
@@ -295,7 +295,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 children: [
                                   const Icon(
                                     Icons.link,
-                                    color: Color(0xFFFF6B6B),
+                                    color: Color.fromARGB(255, 139, 139, 139),
                                   ),
                                   const SizedBox(width: 5),
                                   Flexible(
@@ -341,7 +341,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               icon: const Icon(Icons.photo_library),
                               label: const Text('Мое портфолио'),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFF6B6B),
+                                backgroundColor: const Color.fromARGB(255, 139, 139, 139),
                                 foregroundColor: Colors.black,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 20,
@@ -365,7 +365,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           //   style: OutlinedButton.styleFrom(
                           //     foregroundColor: Colors.black,
                           //     side: const BorderSide(
-                          //       color: Color(0xFFFF6B6B),
+                          //       color: Color.fromARGB(255, 139, 139, 139),
                           //       width: 2,
                           //     ),
                           //     padding: const EdgeInsets.symmetric(
