@@ -13,7 +13,7 @@ import 'package:photoflow/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const MyApp(isDarkMode: false));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
@@ -26,5 +26,17 @@ void main() {
     // Verify that our counter has incremented.
     expect(find.text('0'), findsNothing);
     expect(find.text('1'), findsOneWidget);
+
+    // Проверяем, что приложение отобразилось
+    expect(find.byType(MaterialApp), findsOneWidget);
+  });
+
+  testWidgets('Dark mode works', (WidgetTester tester) async {
+    // Строим приложение с темной темой
+    await tester.pumpWidget(const MyApp(isDarkMode: true));
+
+    // Проверяем, что тема темная
+    final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
+    expect(materialApp.theme?.brightness, Brightness.dark);
   });
 }

@@ -11,10 +11,11 @@ class RecoveryPage extends StatelessWidget {
     TextEditingController emailController = TextEditingController();
     AuthService authService = AuthService();
     return AppBackground(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          backgroundColor: const Color(0xFFEEEEEE),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
           title: const Text(
             "Восстановление пароля", 

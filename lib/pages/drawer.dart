@@ -196,6 +196,17 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             ),
             const Divider(color: Colors.black26),
             ListTile(
+                  leading: const Icon(Icons.settings, color: Color(0xFFFF6B6B)),
+                  title: Text(
+                    'Настройки',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/settings');
+                  },
+                ),
+            ListTile(
               leading:
                   const Icon(Icons.exit_to_app, color: Color(0xFFFF6B6B)),
               title: const Text('Выйти', style: TextStyle(color: Colors.black)),

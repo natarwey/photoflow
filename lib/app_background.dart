@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 
 class AppBackground extends StatelessWidget {
   final Widget child;
+  final Color backgroundColor;
 
-  const AppBackground({super.key, required this.child});
+  const AppBackground({super.key, required this.child, required this.backgroundColor,});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFEEEEEE), // Светло-серый фон #EEEEEE
+      color: backgroundColor,
       child: child,
     );
   }
