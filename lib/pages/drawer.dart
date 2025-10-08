@@ -6,6 +6,7 @@ import 'package:photoflow/database/services/auth_service.dart';
 import 'package:photoflow/database/services/user_service.dart';
 import 'package:photoflow/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:photoflow/database/models/user.dart' as app_user;
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({super.key});
@@ -22,9 +23,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   String? avatarUrl;
   bool isPhotographer = false;
   bool isLoading = true;
-
-  // Фиксированный user_id для "Мое портфолио"
-  final String fixedUserId = 'fe1511f5-4cea-42d9-9d51-289e0d5d54b4';
   app_user.User? user;
   Photographer? photographer;
 
@@ -40,9 +38,16 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     });
 
     try {
-      // Получаем данные пользователя по фиксированному ID
+      // Получаем userId из SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
+      if (userId == null) {
+        throw Exception("Пользователь не найден");
+      }
+
+      // Получаем данные пользователя по его ID
       final userData =
-          await supabase.from('users').select().eq('id', fixedUserId).single();
+          await supabase.from('users').select().eq('id', userId).single();
 
       if (userData == null || userData.isEmpty) {
         throw Exception("Данные пользователя пустые");
@@ -55,11 +60,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         avatarUrl = user!.avatarUrl;
       });
 
-      // Проверяем, является ли пользователь фотографом
+      // Проверяем, является ли пользователь фотографом (по наличию записи в photographers)
       final photographerData = await supabase
           .from('photographers')
           .select()
-          .eq('user_id', fixedUserId)
+          .eq('user_id', userId)
           .maybeSingle();
 
       if (photographerData != null) {
@@ -68,6 +73,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           isPhotographer = true;
         });
       }
+      // Если photographerData == null, то isPhotographer останется false, что правильно для не-фотографов
     } catch (e) {
       if (kDebugMode) {
         print('Ошибка при загрузке данных пользователя: $e');
@@ -145,11 +151,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   Navigator.pop(context);
 
                   try {
-                    // Получаем данные фотографа по фиксированному user_id
+                    // Получаем данные фотографа по текущему user_id
                     final photographerData = await supabase
                         .from('photographers')
                         .select()
-                        .eq('user_id', fixedUserId)
+                        .eq('user_id', user!.id) // Используем id текущего пользователя
                         .single();
 
                     final int photographerId = photographerData['id'];

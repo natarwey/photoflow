@@ -24,8 +24,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Photographer? photographer;
   bool isLoading = true;
   
-  final String fixedUserId = 'fe1511f5-4cea-42d9-9d51-289e0d5d54b4';
-
   @override
   void initState() {
     super.initState();
@@ -33,70 +31,36 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   Future<void> _loadUserData() async {
-    // try {
-    //   final prefs = await SharedPreferences.getInstance();
-    //   final userId = prefs.getString('userId');
-    //   final photographerId = ModalRoute.of(context)!.settings.arguments as int;
-    //   final photographer = await _photographerService.getPhotographerById(
-    //     photographerId,
-    //   );
-
-    //   if (userId == null) {
-    //     throw Exception("Пользователь не найден");
-    //   }
-
-    //   // Получаем данные пользователя
-    //   final userData =
-    //       await supabase.from('users').select().eq('id', userId).single();
-
-    //   setState(() {
-    //     user = app_user.User.fromJson(userData);
-    //   });
-
-    //   // Если это фотограф — загружаем доп информацию
-    //   final photographerData =
-    //       await supabase
-    //           .from('photographers')
-    //           .select()
-    //           .eq('user_id', userId)
-    //           .maybeSingle();
-    //   if (photographerData != null) {
-    //     Photographer photographer = Photographer.fromJson(photographerData);
-    //     await PhotographerService().getPhotographerByUserId(
-    //       userId,
-    //     ); // Можно использовать уже готовый метод
-    //     setState(() {
-    //       photographer = photographer;
-    //     });
-    //   }
-
     setState(() {
       isLoading = true;
     });
-    
     try {
-      // Получаем данные пользователя по фиксированному ID
+      // Получаем userId из SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
+      if (userId == null) {
+        throw Exception("Пользователь не найден");
+      }
+
+      // Получаем данные пользователя по его ID
       final userData = await supabase
           .from('users')
           .select()
-          .eq('id', fixedUserId)
+          .eq('id', userId)
           .single();
-
       if (userData == null || userData.isEmpty) {
         throw Exception("Данные пользователя пустые");
       }
-
       setState(() {
         user = app_user.User.fromJson(userData);
       });
 
-      // Проверяем, является ли пользователь фотографом
+      // Проверяем, является ли пользователь фотографом (по наличию записи в photographers)
       final photographerData = await supabase
           .from('photographers')
           .select()
-          .eq('user_id', fixedUserId)
+          .eq('user_id', userId)
           .maybeSingle();
-
       if (photographerData != null) {
         final photographer = Photographer.fromJson(photographerData);
         // Загружаем дополнительную информацию о фотографе
@@ -105,6 +69,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           this.photographer = photographer;
         });
       }
+      // Если photographerData == null, то photographer останется null, что правильно для не-фотографов
     } catch (e) {
       print('Ошибка при загрузке данных пользователя: $e');
       // ScaffoldMessenger.of(context).showSnackBar(
