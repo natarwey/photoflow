@@ -28,7 +28,6 @@ class _PortfolioPageState extends State<PortfolioPage> {
   final GenreService _genreService = GenreService();
   final MoodService _moodService = MoodService();
   final LocationService _locationService = LocationService();
-
   Photographer? photographer;
   List<PortfolioItem> portfolioItems = [];
   List<Genre> genres = [];
@@ -50,7 +49,6 @@ class _PortfolioPageState extends State<PortfolioPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final arguments = ModalRoute.of(context)!.settings.arguments;
-    
     if (arguments is Map<String, dynamic>) {
       final photographerId = arguments['photographerId'] as int;
       isMyPortfolio = arguments['isMyPortfolio'] as bool? ?? false;
@@ -66,13 +64,11 @@ class _PortfolioPageState extends State<PortfolioPage> {
     setState(() {
       isLoading = true;
     });
-
     try {
       // Загружаем данные фотографа
       final photographerData = await _photographerService.getPhotographerById(
         photographerId,
       );
-
       // Загружаем портфолио фотографа
       final portfolioData = await _portfolioService
           .getPortfolioByPhotographerId(photographerId);
@@ -82,7 +78,6 @@ class _PortfolioPageState extends State<PortfolioPage> {
         final genresData = await _genreService.getGenres();
         final moodsData = await _moodService.getMoods();
         final locationsData = await _locationService.getLocations();
-        
         setState(() {
           genres = genresData;
           moods = moodsData;
@@ -105,34 +100,33 @@ class _PortfolioPageState extends State<PortfolioPage> {
     }
   }
 
-Future<void> _pickImage() async {
-  try {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,  // Убираем allowedExtensions
-      withData: true,
-    );
-
-    if (result != null && result.files.isNotEmpty) {
-      final file = result.files.first;
-      if (file.bytes != null) {
-        setState(() {
-          selectedImageBytes = file.bytes;
-          selectedImageName = file.name;
-        });
+  Future<void> _pickImage() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        withData: true,
+      );
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.first;
+        if (file.bytes != null) {
+          setState(() {
+            selectedImageBytes = file.bytes;
+            selectedImageName = file.name;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка выбора файла: $e')),
+        );
       }
     }
-  } catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка выбора файла: $e')),
-      );
-    }
   }
-}
 
   Future<void> _uploadPhoto() async {
-    if (selectedImageBytes == null || 
-        photoTitle.isEmpty || 
+    if (selectedImageBytes == null ||
+        photoTitle.isEmpty ||
         selectedGenre == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -162,16 +156,17 @@ Future<void> _pickImage() async {
           .from('portfolio')
           .getPublicUrl(filePath);
 
-      // Добавляем запись в базу данных с жестко заданным photographer_id = 2
-    await supabase.from('portfolio_items').insert({
-      'photographer_id': 2, // Жестко заданный ID фотографа
-      'image_url': imageUrl,
-      'title': photoTitle,
-      'genre_id': selectedGenre!.id,
-      'mood_id': selectedMood?.id,
-      'location_id': selectedLocation?.id != null ? int.parse(selectedLocation!.id) : null,
-      'created_at': DateTime.now().toIso8601String(),
-    }).select();
+      // Добавляем запись в базу данных
+      // ИСПРАВЛЕНО: Используем photographer!.id (int), а не жестко заданное значение "2"
+      await supabase.from('portfolio_items').insert({
+        'photographer_id': photographer!.id, // <-- ИСПРАВЛЕНО: используем id текущего фотографа
+        'image_url': imageUrl,
+        'title': photoTitle,
+        'genre_id': selectedGenre!.id,
+        'mood_id': selectedMood?.id,
+        'location_id': selectedLocation?.id, // <-- ИСПРАВЛЕНО: убрано int.parse, так как id уже int
+        'created_at': DateTime.now().toIso8601String(),
+      }).select();
 
       // Обновляем список портфолио
       await _loadData(photographer!.id);
@@ -262,7 +257,6 @@ Future<void> _pickImage() async {
                           ),
                         ),
                       const SizedBox(height: 16),
-                      
                       // Кнопка выбора фото
                       ElevatedButton.icon(
                         onPressed: () async {
@@ -277,7 +271,6 @@ Future<void> _pickImage() async {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      
                       // Поле названия
                       TextField(
                         decoration: const InputDecoration(
@@ -289,7 +282,6 @@ Future<void> _pickImage() async {
                         },
                       ),
                       const SizedBox(height: 16),
-                      
                       // Выбор жанра
                       DropdownButtonFormField<Genre>(
                         decoration: const InputDecoration(
@@ -310,7 +302,6 @@ Future<void> _pickImage() async {
                         },
                       ),
                       const SizedBox(height: 16),
-                      
                       // Выбор настроения
                       DropdownButtonFormField<Mood>(
                         decoration: const InputDecoration(
@@ -331,7 +322,6 @@ Future<void> _pickImage() async {
                         },
                       ),
                       const SizedBox(height: 16),
-                      
                       // Выбор локации
                       DropdownButtonFormField<Location>(
                         decoration: const InputDecoration(
@@ -426,12 +416,10 @@ Future<void> _pickImage() async {
             .from('mood')
             .select()
             .inFilter('id', moodIds.toList());
-
         Map<int, String> moodMap = {};
         for (var mood in moodsResponse) {
           moodMap[mood['id'] as int] = mood['title'] as String;
         }
-
         for (var item in items) {
           if (item.moodId != null) {
             item.moodTitle = moodMap[item.moodId];
@@ -445,12 +433,10 @@ Future<void> _pickImage() async {
             .from('location')
             .select()
             .inFilter('id', locationIds.toList());
-
         Map<int, String> locationMap = {};
         for (var location in locationsResponse) {
           locationMap[location['id'] as int] = location['title'] as String;
         }
-
         for (var item in items) {
           if (item.locationId != null) {
             item.locationTitle = locationMap[item.locationId];
@@ -603,7 +589,7 @@ Future<void> _pickImage() async {
       appBar: AppBar(
         title: Text(
           photographer != null
-              ? isMyPortfolio 
+              ? isMyPortfolio
                   ? 'Мое портфолио'
                   : 'Портфолио ${photographer!.name ?? ''} ${photographer!.surname ?? ''}'
               : 'Портфолио',

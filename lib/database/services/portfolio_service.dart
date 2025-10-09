@@ -140,138 +140,79 @@ class PortfolioService {
   }
 
   // Загрузка дополнительной информации для элементов портфолио
-  Future<void> _loadAdditionalInfo(List<PortfolioItem> items) async {
-    if (items.isEmpty) return;
+Future<void> _loadAdditionalInfo(List<PortfolioItem> items) async {
+  if (items.isEmpty) return;
+  try {
+    // Получаем уникальные ID жанров, настроений и локаций
+    Set<int> genreIds = items.map((item) => item.genreId).toSet();
+    Set<int?> moodIds =
+        items
+            .map((item) => item.moodId)
+            .where((id) => id != null)
+            .cast<int>()
+            .toSet();
+    Set<int?> locationIds =
+        items
+            .map((item) => item.locationId)
+            .where((id) => id != null)
+            .cast<int>()
+            .toSet();
 
-    try {
-      // Получаем уникальные ID жанров, настроений и локаций
-      Set<int> genreIds = items.map((item) => item.genreId).toSet();
-      Set<int?> moodIds =
-          items
-              .map((item) => item.moodId)
-              .where((id) => id != null)
-              .cast<int>()
-              .toSet();
-      Set<int?> locationIds =
-          items
-              .map((item) => item.locationId)
-              .where((id) => id != null)
-              .cast<int>()
-              .toSet();
-      Set<String> userIds =
-          items.map((item) => item.photographerId.toString()).toSet();
-
-      // Загружаем пользователей
-      if (userIds.isNotEmpty) {
-        final usersResponse = await supabase
-            .from('users')
-            .select()
-            .inFilter('id', userIds.toList());
-
-        Map<String, Map<String, dynamic>> userMap = {};
-        for (var user in usersResponse) {
-          userMap[user['id']] = user;
-        }
-
-        // Присваиваем имя и фамилию к каждому элементу портфолио
-        for (var item in items) {
-          Map<String, dynamic>? user = userMap[item.photographerId.toString()];
-          if (user != null) {
-            item.photographerName = user['name'];
-            item.photographerSurname = user['surname'];
-          }
-        }
+    // Загружаем жанры
+    if (genreIds.isNotEmpty) {
+      final genresResponse = await supabase
+          .from('genres')
+          .select()
+          .inFilter('id', genreIds.toList());
+      Map<int, String> genreMap = {};
+      for (var genre in genresResponse) {
+        genreMap[genre['id']] = genre['title'];
       }
-
-      // Загружаем жанры
-      if (genreIds.isNotEmpty) {
-        final genresResponse = await supabase
-            .from('genres')
-            .select()
-            .inFilter('id', genreIds.toList());
-
-        Map<int, String> genreMap = {};
-        for (var genre in genresResponse) {
-          genreMap[genre['id']] = genre['title'];
-        }
-
-        // Присваиваем названия жанров
-        for (var item in items) {
-          item.genreTitle = genreMap[item.genreId];
-        }
-      }
-
-      // Загружаем настроения
-      if (moodIds.isNotEmpty) {
-        final moodsResponse = await supabase
-            .from('mood')
-            .select()
-            .inFilter('id', moodIds.toList());
-
-        Map<int, String> moodMap = {};
-        for (var mood in moodsResponse) {
-          moodMap[mood['id']] = mood['title'];
-        }
-
-        // Присваиваем названия настроений
-        for (var item in items) {
-          if (item.moodId != null) {
-            item.moodTitle = moodMap[item.moodId];
-          }
-        }
-      }
-
-      // Загружаем локации
-      if (locationIds.isNotEmpty) {
-        final locationsResponse = await supabase
-            .from('location')
-            .select()
-            .inFilter('id', locationIds.toList());
-
-        Map<int, String> locationMap = {};
-        for (var location in locationsResponse) {
-          locationMap[location['id']] = location['title'];
-        }
-
-        // Присваиваем названия локаций
-        for (var item in items) {
-          if (item.locationId != null) {
-            item.locationTitle = locationMap[item.locationId];
-          }
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Ошибка при загрузке дополнительной информации: $e');
+      for (var item in items) {
+        item.genreTitle = genreMap[item.genreId];
       }
     }
-  }
 
-  // Получение всех настроений
-  Future<List<Mood>> getMoods() async {
-    try {
-      final response = await supabase.from('mood').select().order('title');
-
-      return response.map<Mood>((item) => Mood.fromJson(item)).toList();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Ошибка при получении настроений: $e');
+    // Загружаем настроения
+    if (moodIds.isNotEmpty) {
+      final moodsResponse = await supabase
+          .from('mood')
+          .select()
+          .inFilter('id', moodIds.toList());
+      Map<int, String> moodMap = {};
+      for (var mood in moodsResponse) {
+        moodMap[mood['id']] = mood['title'];
       }
-      return [];
+      for (var item in items) {
+        if (item.moodId != null) {
+          item.moodTitle = moodMap[item.moodId];
+        }
+      }
+    }
+
+    // Загружаем локации
+    if (locationIds.isNotEmpty) {
+      final locationsResponse = await supabase
+          .from('location')
+          .select()
+          .inFilter('id', locationIds.toList());
+      Map<int, String> locationMap = {};
+      for (var location in locationsResponse) {
+        locationMap[location['id']] = location['title'];
+      }
+      for (var item in items) {
+        if (item.locationId != null) {
+          item.locationTitle = locationMap[item.locationId];
+        }
+      }
+    }
+
+    // ⚠️ УДАЛЯЕМ блок загрузки пользователей по photographerId!
+    // Имя и фамилия уже приходят из запроса через photographers(user_id(...))
+  } catch (e) {
+    if (kDebugMode) {
+      print('Ошибка при загрузке дополнительной информации: $e');
     }
   }
-
-  // Получение всех локаций
-  Future<List<Location>> getLocations() async {
-    try {
-      final response = await supabase.from('location').select().order('title');
-
-      return response.map<Location>((item) => Location.fromJson(item)).toList();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Ошибка при получении локаций: $e');
-      }
-      return [];
-    }
-  }
+}
 }

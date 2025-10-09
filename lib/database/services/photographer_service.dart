@@ -150,60 +150,60 @@ class PhotographerService {
 
   // Загрузка дополнительной информации для фотографов
   Future<void> loadAdditionalInfo(List<Photographer> photographers) async {
-    if (photographers.isEmpty) return;
+  if (photographers.isEmpty) return;
+  try {
+    // Собираем уникальные ID пользователей и городов
+    Set<String> userIds = photographers.map((p) => p.userId).toSet();
+    Set<int> cityIds = photographers.map((p) => p.cityId).toSet();
 
-    try {
-      Set<String> userIds = photographers.map((p) => p.userId).toSet();
-      Set<int> cityIds = photographers.map((p) => p.cityId).toSet();
+    // Загружаем данные пользователей
+    if (userIds.isNotEmpty) {
+      final usersResponse = await supabase
+          .from('users')
+          .select('id, name, surname, avatar_url')
+          .inFilter('id', userIds.toList());
 
-      // Получаем данные пользователей
-      if (userIds.isNotEmpty) {
-        final usersResponse = await supabase
-            .from('users')
-            .select('id, name, surname, avatar_url')
-            .inFilter('id', userIds.toList());
-
-        Map<String, Map<String, dynamic>> userMap = {};
-        for (var userData in usersResponse) {
-          userMap[userData['id'].toString()] = {
-            'name': userData['name'],
-            'surname': userData['surname'],
-            'avatar_url': userData['avatar_url'],
-          };
-        }
-
-        for (var photographer in photographers) {
-          final userData = userMap[photographer.userId];
-          if (userData != null) {
-            photographer.name = userData['name'];
-            photographer.surname = userData['surname'];
-            photographer.avatarUrl = userData['avatar_url'];
-          }
-        }
+      // Создаем мапу для быстрого доступа
+      Map<String, Map<String, dynamic>> userMap = {};
+      for (var userData in usersResponse) {
+        userMap[userData['id']] = {
+          'name': userData['name'],
+          'surname': userData['surname'],
+          'avatar_url': userData['avatar_url'],
+        };
       }
 
-      // Получаем города
-      if (cityIds.isNotEmpty) {
-        final citiesResponse = await supabase
-            .from('city')
-            .select('id, title')
-            .inFilter('id', cityIds.toList());
-
-        Map<int, String> cityMap = {};
-        for (var city in citiesResponse) {
-          cityMap[city['id'] as int] = city['title'] as String;
+      // Присваиваем данные каждому фотографу
+      for (var photographer in photographers) {
+        final userData = userMap[photographer.userId];
+        if (userData != null) {
+          photographer.name = userData['name'];
+          photographer.surname = userData['surname'];
+          photographer.avatarUrl = userData['avatar_url'];
         }
-
-        for (var photographer in photographers) {
-          photographer.cityTitle = cityMap[photographer.cityId];
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print(
-          'Ошибка при загрузке дополнительной информации для фотографов: $e',
-        );
       }
     }
+
+    // Загружаем города
+    if (cityIds.isNotEmpty) {
+      final citiesResponse = await supabase
+          .from('city')
+          .select('id, title')
+          .inFilter('id', cityIds.toList());
+
+      Map<int, String> cityMap = {};
+      for (var city in citiesResponse) {
+        cityMap[city['id'] as int] = city['title'] as String;
+      }
+
+      for (var photographer in photographers) {
+        photographer.cityTitle = cityMap[photographer.cityId];
+      }
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Ошибка при загрузке дополнительной информации для фотографов: $e');
+    }
   }
+}
 }
